@@ -18,7 +18,7 @@ func main() {
 		Command(tui.NewCommand("build", "build the current project's website", commands.RegisterBuild, commands.RunBuild)).
 		Command(tui.NewCommand("serve", "preview the current project's website over HTTP", commands.RegisterServe, commands.RunServe)).
 		Command(tui.NewCommand("init", "equip the project with a variant: monolith, --static, --book, --cli, or --template", commands.RegisterInit, commands.RunInit)).
-		Command(tui.NewCommand("test", "run the tests of the current project", nil, commands.RunTest)).
+		Command(tui.NewCommand("test", "run the tests of the current project", commands.RegisterTest, commands.RunTest)).
 		Command(tui.NewCommand("vet", "run go vet on the current project", nil, commands.RunVet)).
 		Command(tui.NewCommand("fmt", "check formatting with gofmt/go fmt", commands.RegisterFmt, commands.RunFmt)).
 		Command(tui.NewCommand("run", "build and run the current app", commands.RegisterRun, commands.RunRun)).
