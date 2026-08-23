@@ -41,14 +41,37 @@ func RunBuild(fs *flag.FlagSet) core.ExitCode {
 		return fail(err)
 	}
 	switch {
+	case hasDir(root, "pages"):
+		return buildSSGFromFile(root, cfg, fs)
 	case cfg.IsSSG():
 		return buildSSGFromConfig(root, cfg, fs)
 	case hasDir(root, "manuscript"):
 		return buildManuscript(root, cfg, fs)
 	default:
-		fmt.Fprintln(os.Stderr, "kiw: no website found — add an `ssg:` key to krewire.yaml or add a manuscript/ directory")
+		fmt.Fprintln(os.Stderr, "kiw: no website found — add pages/*.kiw, an `ssg:` key to krewire.yaml, or a manuscript/ directory")
 		return core.ExitCodeUsage
 	}
+}
+
+// buildSSGFromFile builds the project's SSG site from the file-based layout
+// (pages/, components/, layouts/, content/, public/) using ssg.LoadFromDir.
+// krewire.yaml supplies metadata (title, description, theme) and output dir.
+func buildSSGFromFile(root string, cfg *rvconf.Config, fs *flag.FlagSet) core.ExitCode {
+	output := firstNonEmpty(flagValue(fs, "output"), cfg.Output, "site")
+	outDir := joinRoot(root, output, "site")
+	slog.Info("building SSG site from file layout", "root", root, "output", outDir)
+	site, err := ssg.LoadFromDir(root)
+	if err != nil {
+		return fail(err)
+	}
+	created, err := site.Build(outDir)
+	if err != nil {
+		return fail(err)
+	}
+	for _, p := range created {
+		fmt.Println("created " + p)
+	}
+	return core.ExitCodeSuccess
 }
 
 // buildSSGFromConfig builds the project's SSG site from the `ssg:` section
