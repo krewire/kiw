@@ -1,6 +1,6 @@
 # Krewire
 
-**Krewire** is the single CLI entry point for the entire Krewire ecosystem — `github.com/krewire/krewire`. It drives all eight project kinds (`app`, `cli`, `site`, `book`, `worker`, `service`, `infra`, `kernel`) from one binary, one config file (`krewire.yaml`), and one workflow. The binary is named **`kiw`** for fast typing (`krewire` remains the module/repo name).
+**Krewire** is the single CLI entry point for the entire Krewire ecosystem. It drives all eight project kinds (`app`, `cli`, `site`, `book`, `worker`, `service`, `infra`, `kernel`) from one binary, one config file (`krewire.yaml`), and one workflow. The binary is named **`kiw`** for fast typing (`krewire` remains the module/repo name).
 
 The devtool dogfoods the unified framework's `cli` package, so the tool that manages the ecosystem is itself built on the stack it manages.
 
