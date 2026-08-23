@@ -1,0 +1,8 @@
+# Build artifacts
+/kiw
+/krewire
+/bin/
+
+# Test artifacts
+*.test
+*.out
