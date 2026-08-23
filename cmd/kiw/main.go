@@ -24,7 +24,8 @@ func main() {
 		Command(tui.NewCommand("run", "build and run the current app", commands.RegisterRun, commands.RunRun)).
 		Command(tui.NewCommand("dev", "run the current app in dev mode with auto-restart", commands.RegisterDev, commands.RunDev)).
 		Command(tui.NewCommand("deploy", "stage deployable artifacts in dist/", commands.RegisterDeploy, commands.RunDeploy)).
-		Command(tui.NewCommand("guild", "install the Guild AI agent template into a project", commands.RegisterGuild, commands.RunGuild))
+		Command(tui.NewCommand("guild", "install the Guild AI agent template into a project", commands.RegisterGuild, commands.RunGuild)).
+		Command(tui.NewCommand("ws", "workspace for monorepo, multi-repo, multi-project, microservices", commands.RegisterWs, commands.RunWs))
 
 	os.Exit(int(app.Run(os.Args[1:])))
 }
