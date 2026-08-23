@@ -14,6 +14,6 @@
 
 ## Contribution
 
-- Read `internal/docs/project-vision.md` and `internal/docs/specs/krewire/index.md` (or central `internal/docs/specs/index.md`) before changing behavior.
+- Read [`project-vision.md`](https://github.com/krewire/internal/blob/main/docs/project-vision.md) and `docs/specs/index.md` before changing behavior.
 - Add/update tests matching project patterns; keep suite green.
 - Update `README.md` / `docs/` and specs when public behavior changes; follow ecosystem spec conventions.

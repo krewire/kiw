@@ -4,7 +4,7 @@
 
 The devtool dogfoods the unified framework's `cli` package, so the tool that manages the ecosystem is itself built on the stack it manages.
 
-> Unified vision: [`KWF-M8K2Q`](../framework/docs/specs/KWF-ARCH-M8K2Q-unified-framework-vision.md)
+> Unified vision: [`KWF-M8K2Q`](https://github.com/krewire/framework/blob/main/docs/specs/KWF-ARCH-M8K2Q-unified-framework-vision.md)
 
 ## Commands
 
