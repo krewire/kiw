@@ -234,6 +234,10 @@ func gitignoreTemplate(name string) string {
 	return fmt.Sprintf(`# Compiled binary
 /%s
 
+# Krewire build outputs
+site/
+.krewire/
+
 # Editor and OS noise
 .idea/
 .vscode/
