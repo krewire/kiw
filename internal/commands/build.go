@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/krewire/framework/plugin"
+	_ "github.com/krewire/framework/plugin"
 	"github.com/krewire/framework/ui"
 	"github.com/krewire/framework/web/ssg"
 	"github.com/krewire/kiw/internal/config"
@@ -56,6 +58,8 @@ func RunBuild(fs *flag.FlagSet) core.ExitCode {
 // buildSSGFromFile builds the project's SSG site from the file-based layout
 // (pages/, components/, layouts/, content/, public/) using ssg.LoadFromDir.
 // krewire.yaml supplies metadata (title, description, theme) and output dir.
+// After the core site is built, any detected plugins (e.g., Tailwind via
+// tailwind.config.js) are run — they may write additional assets into outDir.
 func buildSSGFromFile(root string, cfg *config.Config, fs *flag.FlagSet) core.ExitCode {
 	output := firstNonEmpty(flagValue(fs, "output"), cfg.Output, "site")
 	outDir := joinRoot(root, output, "site")
@@ -67,6 +71,17 @@ func buildSSGFromFile(root string, cfg *config.Config, fs *flag.FlagSet) core.Ex
 	created, err := site.Build(outDir)
 	if err != nil {
 		return fail(err)
+	}
+	// Run detected plugins (Tailwind is the first; others follow the same pattern).
+	for _, p := range plugin.Registry {
+		if p.Detect(root) {
+			slog.Info("plugin detected", "plugin", p.Name())
+			if err := p.Build(root, outDir); err != nil {
+				slog.Warn("plugin build failed", "plugin", p.Name(), "err", err)
+			} else {
+				slog.Info("plugin built", "plugin", p.Name())
+			}
+		}
 	}
 	for _, p := range created {
 		fmt.Println("created " + p)
