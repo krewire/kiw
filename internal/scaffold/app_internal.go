@@ -23,7 +23,6 @@ import (
 
 type Config struct {
 	Meta *config.Metadata
-	Cfg  config.Config
 }
 
 // webProvider assembles the SSR side of the app: theme, layout, pages, and
@@ -54,9 +53,9 @@ func (p *webProvider) Boot(c *rvapp.Container) error {
 }
 
 // New assembles the full application and returns the ready *web.App
-func New(meta *config.Metadata, appCfg config.Config) (*rvweb.App, error) {
+func New(meta *config.Metadata) (*rvweb.App, error) {
 	container, err := rvapp.NewApp(
-		&configProvider{meta: meta, cfg: appCfg},
+		&configProvider{meta: meta},
 		&webProvider{},
 		&http.Provider{},
 	).Build()
@@ -68,13 +67,12 @@ func New(meta *config.Metadata, appCfg config.Config) (*rvweb.App, error) {
 
 type configProvider struct {
 	meta *config.Metadata
-	cfg  config.Config
 }
 
 // Register binds the loaded config into the container.
 func (p *configProvider) Register(c *rvapp.Container) error {
 	return rvapp.Singleton[*Config](c, func() *Config {
-		return &Config{Meta: p.meta, Cfg: p.cfg}
+		return &Config{Meta: p.meta}
 	})
 }
 
@@ -86,29 +84,27 @@ func (p *configProvider) Boot(c *rvapp.Container) error { return nil }
 func internalConfigTemplate() string {
 	return "// Package config defines the typed application configuration\n" +
 		"// krewire.yaml: metadata and project-level config (metadata only)\n" +
-		"// cfg.yaml: key-value runtime configuration (key-value pairs)\n" +
 		"package config\n\n" +
 		"import (\n" +
 		"\t\"fmt\"\n" +
 		"\t\"os\"\n\n" +
 		"\trconfig \"github.com/krewire/libs/config\"\n" +
-		"\trcfg \"github.com/krewire/libs/cfg\"\n" +
 		"\t\"github.com/krewire/libs/validate\"\n" +
 		")\n\n" +
-		"// Metadata is the project metadata from krewire.yaml\n" +
+		"// Metadata mirrors krewire.yaml.\n" +
 		"type Metadata struct {\n" +
-		"\tAddr  string `yaml:\"addr\" env:\"APP_ADDR\" validate:\"required\"`\n" +
-		"\tTitle string `yaml:\"title\" env:\"TITLE\" validate:\"required\"`\n" +
-		"\tKind  string `yaml:\"kind\" validate:\"required\"`\n" +
-		"\tName  string `yaml:\"name\" validate:\"required\"`\n" +
+		"\tProject Project `yaml:\"project\"`\n" +
+		"}\n\n" +
+		"// Project holds the project section of krewire.yaml.\n" +
+		"type Project struct {\n" +
+		"\tName    string `yaml:\"name\" validate:\"required\"`\n" +
+		"\tKind    string `yaml:\"kind\" validate:\"required\"`\n" +
 		"\tVersion string `yaml:\"version\"`\n" +
 		"}\n\n" +
-		"// Config is the key-value runtime configuration from cfg.yaml\n" +
-		"type Config rcfg.Config\n\n" +
 		"// LoadMetadata reads krewire.yaml from path, overlays the environment, and returns a\n" +
 		"// validated Metadata.\n" +
 		"func LoadMetadata(path string) (*Metadata, error) {\n" +
-		"\tcfg := &Metadata{Addr: \":8080\", Title: \"Krewire Monolith\", Kind: \"app\", Version: \"0.1.0\"}\n" +
+		"\tcfg := &Metadata{}\n" +
 		"\tif err := rconfig.Load(path, cfg); err != nil {\n" +
 		"\t\treturn nil, err\n" +
 		"\t}\n" +
@@ -119,18 +115,6 @@ func internalConfigTemplate() string {
 		"\t\treturn nil, fmt.Errorf(\"config: %w\", err)\n" +
 		"\t}\n" +
 		"\treturn cfg, nil\n" +
-		"}\n\n" +
-		"// LoadConfig loads key-value configuration from cfg.yaml\n" +
-		"func LoadConfig(path string) (Config, error) {\n" +
-		"\treturn rcfg.Load(path)\n" +
-		"}\n\n" +
-		"// ConfigWithDefaults loads cfg.yaml and applies defaults\n" +
-		"func ConfigWithDefaults(path string, defaults Config) (Config, error) {\n" +
-		"\tcfg, err := rcfg.Load(path)\n" +
-		"\tif err != nil {\n" +
-		"\t\treturn nil, err\n" +
-		"\t}\n" +
-		"\treturn cfg.WithDefaults(defaults), nil\n" +
 		"}\n\n" +
 		"`"
 }

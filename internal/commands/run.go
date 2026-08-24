@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"syscall"
 
-	"github.com/krewire/kiw/internal/rvconf"
+	"github.com/krewire/kiw/internal/config"
 	"github.com/krewire/kiw/internal/shape"
 	"github.com/krewire/libs/core"
 )
@@ -173,7 +173,7 @@ func childExitCode(cmd *exec.Cmd, err error) core.ExitCode {
 // exportSiteAssets refreshes the site/book export so embedded assets are
 // current before the app starts (RND-RUN-005). No-op when no site is declared.
 func exportSiteAssets(root string, fs *flag.FlagSet) core.ExitCode {
-	cfg, err := rvconf.Load(root)
+	cfg, err := config.Load(root)
 	if err != nil {
 		return fail(err)
 	}

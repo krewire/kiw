@@ -1,4 +1,4 @@
-package rvconf
+package config
 
 import (
 	"os"

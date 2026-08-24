@@ -1,8 +1,8 @@
-// Package rvconf reads project configuration from krewire.yaml so that `kiw`
+// Package config reads project configuration from krewire.yaml so that `kiw`
 // commands can drive any project kind without a project-specific cmd.
 // A krewire.yaml with an `ssg:` key triggers SSG mode; one with a manuscript/
 // directory triggers book mode. All top-level fields are shared across modes.
-package rvconf
+package config
 
 import (
 	"errors"
@@ -207,11 +207,11 @@ func Load(dir string) (*Config, error) {
 		if errors.Is(err, os.ErrNotExist) {
 			return &Config{}, nil
 		}
-		return nil, fmt.Errorf("rvconf: read %s: %w", path, err)
+		return nil, fmt.Errorf("config: read %s: %w", path, err)
 	}
 	var c Config
 	if err := yaml.Unmarshal(data, &c); err != nil {
-		return nil, fmt.Errorf("rvconf: parse %s: %w", path, err)
+		return nil, fmt.Errorf("config: parse %s: %w", path, err)
 	}
 	return &c, nil
 }

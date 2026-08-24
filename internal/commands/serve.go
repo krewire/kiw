@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/krewire/kiw/internal/rvconf"
+	"github.com/krewire/kiw/internal/config"
 	"github.com/krewire/kiw/internal/shape"
 	"github.com/krewire/libs/core"
 	"github.com/krewire/mdbind/book"
@@ -72,7 +72,7 @@ func serveBook(root string, fs *flag.FlagSet) core.ExitCode {
 }
 
 // serveSSG previews the project's declarative ssg site from krewire.yaml.
-func serveSSG(fs *flag.FlagSet, cfg *rvconf.Config) core.ExitCode {
+func serveSSG(fs *flag.FlagSet, cfg *config.Config) core.ExitCode {
 	ssgCfg := cfg.ToSSGConfig()
 	addr := firstNonEmpty(flagValue(fs, "addr"), ":8080")
 	slog.Info("serving site", "addr", addr)

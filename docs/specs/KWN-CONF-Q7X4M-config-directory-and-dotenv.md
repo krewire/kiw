@@ -48,17 +48,19 @@ environment promotion error-prone.
 
 | ID            | Requirement                                                                                        | Priority | Scope    |
 | ------------- | -------------------------------------------------------------------------------------------------- | -------- | -------- |
-| KWL-DOTV-001  | `cfg.LoadDotEnv(path)` parses `KEY=VALUE` lines into the process environment without overwriting already-set variables. | Must | Package |
-| KWL-DOTV-002  | Parsing tolerates comments (`#`), blanks, optional `export ` prefixes, and single/double-quoted values; a missing file is not an error. | Must | Package |
-| KWL-DOTV-003  | A malformed non-comment line returns an error naming the line number.                              | Must     | Package |
-| KWL-CFGV-004  | `cfg.Config.GetOr(key, fallback)` returns the stored value when present and non-empty, otherwise the caller's fallback. | Must | Package |
 | KWL-CFGV-005  | Scaffold emits `.env.example`, `.env` (gitignored), and a `config/config.go` whose getters read env with in-code defaults. | Should | Domain |
 | KWL-CFGV-006  | `kiw run` / `kiw dev` load `.env` before spawning the child so providers see resolved values.        | Must     | Func     |
+
+The library primitives behind this flow — `config.LoadDotEnv`,
+`config.ParseDotEnv`, and `(config.Vars).GetOr` — live in
+`github.com/krewire/libs/config` and are specified in
+[KWL-2X1QZ](https://github.com/krewire/libs/blob/main/docs/specs/KWL-CONFIG-2X1QZ-configuration-loading.md)
+§5.5 (rows `CFG-DOTV-001..003`, `CFG-KV-001..005`, formerly `libs/cfg`).
 
 ## 6. Non-Functional Requirements
 
 - NFR1 — Determinism: identical `.env` content resolves identically.
-- NFR2 — No `unsafe`; stdlib plus `gopkg.in/yaml.v3` only in `libs/cfg`.
+- NFR2 — No `unsafe`; stdlib plus `gopkg.in/yaml.v3` only in `libs/config`.
 - NFR3 — Quality gates pass in every touched repo.
 
 ## 7. Success Criteria

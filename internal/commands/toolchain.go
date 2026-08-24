@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/krewire/kiw/internal/config"
 	"github.com/krewire/kiw/internal/gomod"
-	"github.com/krewire/kiw/internal/rvconf"
 	"github.com/krewire/libs/core"
 )
 
@@ -195,7 +195,7 @@ func runTestWatch(dir string, args []string, env []string) core.ExitCode {
 			_ = mod
 		}
 	}
-	cfg, _ := rvconf.Load(filepath.Join(root, "krewire.yaml"))
+	cfg, _ := config.Load(filepath.Join(root, "krewire.yaml"))
 	w := newWatcher(root, 500*time.Millisecond, cfg)
 	defer func() { close(w.done) }()
 

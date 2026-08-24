@@ -68,8 +68,10 @@ func RunInit(fs *flag.FlagSet) core.ExitCode {
 	case scaffold.VariantApp, scaffold.VariantCLI:
 		mod, err := gomod.Find(dir)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "kiw init: not inside a Go module — run 'kiw new <project>' first")
-			return core.ExitCodeUsage
+			return usageOrFail(core.WithHint(
+				core.UsageError("kiw init: not inside a Go module"),
+				"run 'kiw new <project>' first, then 'kiw init --cli' (or another variant) inside it",
+			))
 		}
 		opts.Module = mod.Path
 		opts.Name = moduleBase(opts.Module)

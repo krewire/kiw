@@ -34,7 +34,7 @@ func detectLocalPaths(startDir string) (string, string) {
 
 func goModTemplate(module, frameworkVersion, libsVersion, frameworkPath, libsPath string) string {
 	mod := fmt.Sprintf("module %s\n\ngo 1.22\n\nrequire (\n\t%s %s\n\t%s %s\n)",
-		module, modFramework, strings.TrimSpace(frameworkVersion), modLibs, strings.TrimSpace(libsVersion))
+		module, modFramework, pinnedVersion(frameworkVersion), modLibs, pinnedVersion(libsVersion))
 	if frameworkPath != "" {
 		mod += fmt.Sprintf("\n\nreplace %s => %s", modFramework, frameworkPath)
 	}
@@ -42,6 +42,16 @@ func goModTemplate(module, frameworkVersion, libsVersion, frameworkPath, libsPat
 		mod += fmt.Sprintf("\nreplace %s => %s", modLibs, libsPath)
 	}
 	return mod + "\n"
+}
+
+// pinnedVersion normalizes a version into the v-prefixed form that go.mod
+// require directives mandate ("0.1.0" -> "v0.1.0").
+func pinnedVersion(v string) string {
+	v = strings.TrimSpace(v)
+	if v == "" || strings.HasPrefix(v, "v") {
+		return v
+	}
+	return "v" + v
 }
 
 func krewireYamlTemplate(name string) string {
@@ -70,12 +80,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	appCfg, err := config.LoadConfig("cfg.yaml")
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-	a, err := app.New(meta, appCfg)
+	a, err := app.New(meta)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

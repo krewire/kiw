@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/krewire/kiw/internal/rvconf"
+	"github.com/krewire/kiw/internal/config"
 )
 
 // watcher polls the watched roots for changes, emitting on every change of
@@ -22,9 +22,9 @@ type watcher struct {
 }
 
 // newWatcher returns a watcher polling root every d.
-func newWatcher(root string, d time.Duration, cfg *rvconf.Config) *watcher {
+func newWatcher(root string, d time.Duration, cfg *config.Config) *watcher {
 	watchDirs := defaultWatchDirs()
-	if cfg != nil && cfg.Project.Dirs != (rvconf.Dirs{}) {
+	if cfg != nil && cfg.Project.Dirs != (config.Dirs{}) {
 		if cfg.Project.Dirs.Web != "" {
 			watchDirs = append(watchDirs, cfg.Project.Dirs.Web)
 		}

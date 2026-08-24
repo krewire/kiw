@@ -51,6 +51,7 @@ func cliMainTemplate(module, name string) string {
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/krewire/framework/tui"
@@ -61,13 +62,7 @@ import (
 const version = "0.1.0"
 
 func main() {
-	meta, err := config.LoadMetadata("krewire.yaml")
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-	appCfg, err := config.LoadConfig("cfg.yaml")
-	if err != nil {
+	if _, err := config.LoadMetadata("krewire.yaml"); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
@@ -122,27 +117,27 @@ Built on the [Krewire Framework](https://github.com/krewire/framework) and
 func cliConfigTemplate() string {
 	return "// Package config defines the typed CLI configuration\n" +
 		"// krewire.yaml: metadata and project-level config (metadata only)\n" +
-		"// cfg.yaml: key-value runtime configuration (key-value pairs)\n" +
 		"package config\n\n" +
 		"import (\n" +
 		"\t\"fmt\"\n" +
 		"\t\"os\"\n\n" +
 		"\trconfig \"github.com/krewire/libs/config\"\n" +
-		"\trcfg \"github.com/krewire/libs/cfg\"\n" +
 		"\t\"github.com/krewire/libs/validate\"\n" +
 		")\n\n" +
-		"// Metadata is the project metadata from krewire.yaml\n" +
+		"// Metadata mirrors krewire.yaml.\n" +
 		"type Metadata struct {\n" +
+		"\tProject Project `yaml:\"project\"`\n" +
+		"}\n\n" +
+		"// Project holds the project section of krewire.yaml.\n" +
+		"type Project struct {\n" +
 		"\tName    string `yaml:\"name\" validate:\"required\"`\n" +
 		"\tKind    string `yaml:\"kind\" validate:\"required\"`\n" +
 		"\tVersion string `yaml:\"version\"`\n" +
 		"}\n\n" +
-		"// Config is the key-value runtime configuration from cfg.yaml\n" +
-		"type Config rcfg.Config\n\n" +
 		"// LoadMetadata reads krewire.yaml from path, overlays the environment, and returns a\n" +
 		"// validated Metadata.\n" +
 		"func LoadMetadata(path string) (*Metadata, error) {\n" +
-		"\tcfg := &Metadata{Version: \"0.1.0\"}\n" +
+		"\tcfg := &Metadata{}\n" +
 		"\tif err := rconfig.Load(path, cfg); err != nil {\n" +
 		"\t\treturn nil, err\n" +
 		"\t}\n" +
@@ -153,17 +148,5 @@ func cliConfigTemplate() string {
 		"\t\treturn nil, fmt.Errorf(\"config: %w\", err)\n" +
 		"\t}\n" +
 		"\treturn cfg, nil\n" +
-		"}\n\n" +
-		"// LoadConfig loads key-value configuration from cfg.yaml\n" +
-		"func LoadConfig(path string) (Config, error) {\n" +
-		"\treturn rcfg.Load(path)\n" +
-		"}\n\n" +
-		"// ConfigWithDefaults loads cfg.yaml and applies defaults\n" +
-		"func ConfigWithDefaults(path string, defaults Config) (Config, error) {\n" +
-		"\tcfg, err := rcfg.Load(path)\n" +
-		"\tif err != nil {\n" +
-		"\t\treturn nil, err\n" +
-		"\t}\n" +
-		"\treturn cfg.WithDefaults(defaults), nil\n" +
 		"}\n"
 }

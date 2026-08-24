@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/krewire/kiw/internal/rvconf"
+	"github.com/krewire/kiw/internal/config"
 	"github.com/krewire/libs/core"
 	"github.com/krewire/libs/log"
 )
@@ -19,7 +19,7 @@ var debugEnabled bool
 // effective environment/debug switches (KWL-K4T7W).
 type runtimeEnv struct {
 	root  string
-	cfg   *rvconf.Config
+	cfg   *config.Config
 	env   core.Env
 	debug bool
 }
@@ -34,7 +34,7 @@ func bootRuntime(fs *flag.FlagSet) (*runtimeEnv, core.ExitCode) {
 		fmt.Fprintln(os.Stderr, "kiw: "+err.Error())
 		return nil, core.ExitCodeUsage
 	}
-	c, err := rvconf.Load(root)
+	c, err := config.Load(root)
 	if err != nil {
 		return nil, fail(core.WithStack(err))
 	}

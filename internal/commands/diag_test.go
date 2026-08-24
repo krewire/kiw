@@ -88,3 +88,50 @@ func TestKWL_DIAGV_007_Fail_PrintsAttachedStackWhenDebug(t *testing.T) {
 		t.Errorf("stack printed while debug off:\n%s", quiet)
 	}
 }
+
+// Spec: KWL-P8W2N KWL-ERRV-010 S4 Scope: Domain
+func TestKWL_ERRV_010_Fail_PrintsTreeWithHintWithoutDebug(t *testing.T) {
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	oldStderr := os.Stderr
+	os.Stderr = w
+	prevDebug := debugEnabled
+	debugEnabled = false
+	t.Cleanup(func() { os.Stderr = oldStderr; debugEnabled = prevDebug })
+
+	errd := core.WithHint(
+		core.WithAttrs(core.UsageError("cannot read krewire.yaml"), core.Attr{Key: "file", Value: "krewire.yaml"}),
+		"run 'kiw init' to create one",
+	)
+	code := fail(errd)
+	w.Close()
+
+	out, _ := io.ReadAll(r)
+	tree := string(out)
+	for _, want := range []string{"Error: cannot read krewire.yaml", "file=krewire.yaml", "Hint: run 'kiw init' to create one"} {
+		if !strings.Contains(tree, want) {
+			t.Errorf("tree missing %q:\n%s", want, tree)
+		}
+	}
+	if strings.Contains(tree, "stack trace") {
+		t.Errorf("stack leaked while debug off:\n%s", tree)
+	}
+	if code != core.ExitCodeFailure {
+		t.Errorf("fail code = %d, want failure", code)
+	}
+
+	// usage path keeps exit code 2 while rendering the same tree.
+	r2, w2, _ := os.Pipe()
+	os.Stderr = w2
+	code2 := usageOrFail(core.WithHint(core.UsageError("bad flag combo"), "see 'kiw init --help'"))
+	w2.Close()
+	out2, _ := io.ReadAll(r2)
+	if code2 != core.ExitCodeUsage {
+		t.Errorf("usageOrFail code = %d, want usage", code2)
+	}
+	if !strings.Contains(string(out2), "Hint: see 'kiw init --help'") {
+		t.Errorf("usage tree missing hint:\n%s", out2)
+	}
+}

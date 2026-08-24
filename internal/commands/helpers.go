@@ -18,7 +18,7 @@ func flagValue(fs *flag.FlagSet, name string) string {
 }
 
 func commandError(err error) core.ExitCode {
-	fmt.Fprintln(os.Stderr, "kiw:", err)
+	fmt.Fprint(os.Stderr, core.FormatTree(err))
 	switch {
 	case errors.Is(err, scaffold.ErrInvalidName),
 		errors.Is(err, scaffold.ErrProjectExists),
@@ -31,7 +31,7 @@ func commandError(err error) core.ExitCode {
 }
 
 func fail(err error) core.ExitCode {
-	fmt.Fprintln(os.Stderr, "kiw:", err)
+	fmt.Fprint(os.Stderr, core.FormatTree(err))
 	printStackIfDebug(err)
 	return core.ExitCodeFailure
 }
@@ -55,7 +55,7 @@ func printStackIfDebug(err error) {
 func usageOrFail(err error) core.ExitCode {
 	var ce interface{ ExitCode() core.ExitCode }
 	if errors.As(err, &ce) && ce.ExitCode() == core.ExitCodeUsage {
-		fmt.Fprintln(os.Stderr, "kiw:", err)
+		fmt.Fprint(os.Stderr, core.FormatTree(err))
 		printStackIfDebug(err)
 		return core.ExitCodeUsage
 	}

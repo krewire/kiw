@@ -1,5 +1,5 @@
 // Tests for KWL-K4T7W
-package rvconf
+package config
 
 import (
 	"errors"

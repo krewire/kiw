@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/krewire/kiw/internal/config"
 	"github.com/krewire/kiw/internal/gomod"
-	"github.com/krewire/kiw/internal/rvconf"
 	"github.com/krewire/kiw/internal/shape"
 	"github.com/krewire/kiw/internal/version"
 	"github.com/krewire/libs/core"
@@ -20,7 +20,7 @@ func RunInfo(_ *flag.FlagSet) core.ExitCode {
 		return fail(err)
 	}
 	mod, _ := gomod.Find(dir)
-	cfg, _ := rvconf.Load(dir)
+	cfg, _ := config.Load(dir)
 	res, err := shape.Detect(dir, cfg.Kind())
 	if err != nil {
 		return fail(err)
@@ -60,7 +60,7 @@ func RunInfo(_ *flag.FlagSet) core.ExitCode {
 
 // resolvedEnvLabel renders the effective environment for display, marking an
 // invalid krewire.yaml value instead of failing the report (KWL-K4T7W).
-func resolvedEnvLabel(cfg *rvconf.Config) string {
+func resolvedEnvLabel(cfg *config.Config) string {
 	e, err := cfg.ResolveEnv("")
 	if err == nil {
 		return e.String()
@@ -71,7 +71,7 @@ func resolvedEnvLabel(cfg *rvconf.Config) string {
 	return core.DefaultEnv.String()
 }
 
-func printAppDirs(root string, cfg *rvconf.Config) {
+func printAppDirs(root string, cfg *config.Config) {
 	dirs := resolveDirs(cfg)
 	fmt.Println("Directories")
 	for name, path := range dirs {
@@ -84,7 +84,7 @@ func printAppDirs(root string, cfg *rvconf.Config) {
 	}
 }
 
-func resolveDirs(cfg *rvconf.Config) map[string]string {
+func resolveDirs(cfg *config.Config) map[string]string {
 	d := cfg.Project.Dirs
 	return map[string]string{
 		"cmd":      firstNonEmpty(d.Cmd, "cmd/app"),

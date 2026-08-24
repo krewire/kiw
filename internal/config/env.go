@@ -1,11 +1,11 @@
-package rvconf
+package config
 
 import (
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/krewire/libs/cfg"
+	"github.com/krewire/libs/config"
 	"github.com/krewire/libs/core"
 )
 
@@ -37,7 +37,7 @@ func (c *Config) ResolveDebug(override string, overrideSet bool) bool {
 // LoadDotEnv parses .env at the project root into the process environment
 // without overwriting existing variables (KWN-Q7X4M KWL-CFGV-006).
 func (c *Config) LoadDotEnv(root string) error {
-	return cfg.LoadDotEnv(filepath.Join(root, ".env"))
+	return config.LoadDotEnv(filepath.Join(root, ".env"))
 }
 
 func firstNonEmpty(vals ...string) string {

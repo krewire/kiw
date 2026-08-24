@@ -10,8 +10,8 @@ import (
 
 	"github.com/krewire/framework/ui"
 	"github.com/krewire/framework/web/ssg"
+	"github.com/krewire/kiw/internal/config"
 	"github.com/krewire/kiw/internal/gomod"
-	"github.com/krewire/kiw/internal/rvconf"
 	"github.com/krewire/libs/core"
 	"github.com/krewire/mdbind/book"
 )
@@ -36,7 +36,7 @@ func RunBuild(fs *flag.FlagSet) core.ExitCode {
 		fmt.Fprintln(os.Stderr, "kiw: "+err.Error())
 		return core.ExitCodeUsage
 	}
-	cfg, err := rvconf.Load(root)
+	cfg, err := config.Load(root)
 	if err != nil {
 		return fail(err)
 	}
@@ -56,7 +56,7 @@ func RunBuild(fs *flag.FlagSet) core.ExitCode {
 // buildSSGFromFile builds the project's SSG site from the file-based layout
 // (pages/, components/, layouts/, content/, public/) using ssg.LoadFromDir.
 // krewire.yaml supplies metadata (title, description, theme) and output dir.
-func buildSSGFromFile(root string, cfg *rvconf.Config, fs *flag.FlagSet) core.ExitCode {
+func buildSSGFromFile(root string, cfg *config.Config, fs *flag.FlagSet) core.ExitCode {
 	output := firstNonEmpty(flagValue(fs, "output"), cfg.Output, "site")
 	outDir := joinRoot(root, output, "site")
 	slog.Info("building SSG site from file layout", "root", root, "output", outDir)
@@ -77,7 +77,7 @@ func buildSSGFromFile(root string, cfg *rvconf.Config, fs *flag.FlagSet) core.Ex
 // buildSSGFromConfig builds the project's SSG site from the `ssg:` section
 // of krewire.yaml. Top-level fields (title, output, theme) are merged into the
 // ssg.Config so they don't need to be repeated under ssg:.
-func buildSSGFromConfig(root string, cfg *rvconf.Config, fs *flag.FlagSet) core.ExitCode {
+func buildSSGFromConfig(root string, cfg *config.Config, fs *flag.FlagSet) core.ExitCode {
 	ssgCfg := cfg.ToSSGConfig()
 	output := firstNonEmpty(flagValue(fs, "output"), cfg.Output, "site")
 	outDir := joinRoot(root, output, "site")
@@ -94,7 +94,7 @@ func buildSSGFromConfig(root string, cfg *rvconf.Config, fs *flag.FlagSet) core.
 
 // buildManuscript renders the project's manuscript/ directory with mdbind.
 // Settings come from krewire.yaml in the project root, overridden by flags.
-func buildManuscript(root string, cfg *rvconf.Config, fs *flag.FlagSet) core.ExitCode {
+func buildManuscript(root string, cfg *config.Config, fs *flag.FlagSet) core.ExitCode {
 	title := firstNonEmpty(flagValue(fs, "title"), cfg.Title, moduleName(root))
 	bcfg := book.Config{
 		Input:      joinRoot(root, flagValue(fs, "input"), firstNonEmpty(cfg.Input, "manuscript")),
@@ -119,7 +119,7 @@ func buildManuscript(root string, cfg *rvconf.Config, fs *flag.FlagSet) core.Exi
 
 // themeFrom resolves the theme from the --theme flag and krewire.yaml,
 // defaulting to auto. A mode of off disables the switcher.
-func themeFrom(fs *flag.FlagSet, cfg *rvconf.Theme) *ui.Theme {
+func themeFrom(fs *flag.FlagSet, cfg *config.Theme) *ui.Theme {
 	mode := strings.ToLower(strings.TrimSpace(flagValue(fs, "theme")))
 	if mode == "" && cfg != nil {
 		mode = strings.ToLower(strings.TrimSpace(cfg.Default))
@@ -140,7 +140,7 @@ func themeFrom(fs *flag.FlagSet, cfg *rvconf.Theme) *ui.Theme {
 }
 
 // navFromConfig converts krewire.yaml nav links into book links.
-func navFromConfig(links []rvconf.Link) []book.Link {
+func navFromConfig(links []config.Link) []book.Link {
 	if len(links) == 0 {
 		return nil
 	}

@@ -80,11 +80,10 @@ func TestEquipApp(t *testing.T) {
 		t.Fatal(err)
 	}
 	assertFileContains(t, filepath.Join(dir, "go.mod"), "module example.com/demo")
-	assertFileContains(t, filepath.Join(dir, "main.go"), "config.Load")
-	assertFileContains(t, filepath.Join(dir, "main.go"), "config.LoadConfig")
 	assertFileContains(t, filepath.Join(dir, "main.go"), "config.LoadMetadata")
+	assertFileNotContains(t, filepath.Join(dir, "main.go"), "cfg.yaml")
 	assertFileContains(t, filepath.Join(dir, "krewire.yaml"), "kind: app")
-	assertFileContains(t, filepath.Join(dir, "internal/app/app.go"), "func New(meta *config.Metadata, appCfg config.Config) (*rvweb.App, error)")
+	assertFileContains(t, filepath.Join(dir, "internal/app/app.go"), "func New(meta *config.Metadata) (*rvweb.App, error)")
 	for _, path := range []string{
 		"internal/config/config.go",
 		"internal/http/http.go",

@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/krewire/kiw/internal/rvconf"
+	"github.com/krewire/kiw/internal/config"
 	"github.com/krewire/kiw/internal/shape"
 	"github.com/krewire/libs/core"
 )
@@ -35,7 +35,7 @@ func RunDeploy(fs *flag.FlagSet) core.ExitCode {
 		fmt.Fprintln(os.Stderr, "kiw: "+err.Error())
 		return core.ExitCodeUsage
 	}
-	cfg, err := rvconf.Load(root)
+	cfg, err := config.Load(root)
 	if err != nil {
 		return fail(err)
 	}
