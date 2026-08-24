@@ -161,8 +161,10 @@ func firstNonEmpty(vals ...string) string {
 	return ""
 }
 
-// findRoot locates the nearest Go module root walking up from the working
-// directory.
+// findRoot locates the project root walking up from the working directory.
+// For app/cli/worker/service it is the Go module root (go.mod). For site/book
+// which have no entry point, krewire.yaml or a declarative layout (pages/,
+// manuscript/) is sufficient (KWF-DF3PL FRK-FLS-001/002, KWL-K1N2Q).
 func findRoot() (string, error) {
 	cur, err := os.Getwd()
 	if err != nil {
@@ -174,6 +176,15 @@ func findRoot() (string, error) {
 	}
 	for {
 		if info, err := os.Stat(filepath.Join(cur, "go.mod")); err == nil && !info.IsDir() {
+			return cur, nil
+		}
+		if info, err := os.Stat(filepath.Join(cur, "krewire.yaml")); err == nil && !info.IsDir() {
+			return cur, nil
+		}
+		if info, err := os.Stat(filepath.Join(cur, "pages")); err == nil && info.IsDir() {
+			return cur, nil
+		}
+		if info, err := os.Stat(filepath.Join(cur, "manuscript")); err == nil && info.IsDir() {
 			return cur, nil
 		}
 		parent := filepath.Dir(cur)
