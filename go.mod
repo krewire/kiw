@@ -3,7 +3,7 @@ module github.com/krewire/kiw
 go 1.22
 
 require (
-	github.com/krewire/framework v0.1.0
+	github.com/krewire/framework v0.2.0
 	github.com/krewire/guild v0.1.0
 	github.com/krewire/libs v0.2.0
 )
