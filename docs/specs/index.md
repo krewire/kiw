@@ -15,6 +15,7 @@ Ordered by **impact-to-effort** (high impact, low effort first) and **dependency
 | [KWN-P0FWA](./KWN-TEST-P0FWA-project-validation.md)  | Project Validation                   | Draft | KWN-Z0VFC |
 | [KWN-JB7PW](./KWN-INFO-JB7PW-version-reporting.md)   | Version Reporting                     | Draft | KWN-Z0VFC |
 | [KWN-MZ4LE](./KWN-GUILD-MZ4LE-guild-install-command.md) | krewire guild install Command        | Draft | KWN-Z0VFC |
+| [KWN-Q3M8V](./KWN-WORKSPACE-Q3M8V-workspace-command.md) | Workspace Command — Multi-Repo & Monorepo Workflows | Draft | KWN-Z0VFC |
 | [KWN-Q7X4M](./KWN-CONF-Q7X4M-config-directory-and-dotenv.md) | Config Directory & Dotenv (provider → config/ → .env → krewire.yaml) | Draft | KWL-K4T7W, KWL-2X1QZ, KWN-RD3WS |
 
 ## Conventions
