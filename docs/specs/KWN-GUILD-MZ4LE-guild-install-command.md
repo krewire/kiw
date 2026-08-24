@@ -81,4 +81,4 @@ confirm before overwriting existing managed files.
 ## 9. References
 
 - [guild](https://github.com/krewire/guild) — template + install library.
-- [krewire](https://github.com/krewire/krewire) — the CLI.
+- [kiw](https://github.com/krewire/kiw) — the CLI.

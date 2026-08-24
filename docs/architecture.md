@@ -3,13 +3,13 @@
 ## Module Structure
 
 ```
-krewire/
-├── cmd/kiw/               # Entry — built via `go build -o kiw ./cmd/kiw` (compat: cmd/krewire), dogfoods framework/tui
+kiw/
+├── cmd/kiw/               # Entry — built via `go build -o kiw ./cmd/kiw`, dogfoods framework/tui
 ├── internal/
-│   ├── commands/         # build/serve/run/dev, worker, deploy (--plan/--preview/--destroy), dashboard, generate, info, version, guild, test
+│   ├── commands/         # new/init, build/serve (site+book), run/dev (app+cli), deploy (stages dist/), test/vet/fmt, info/version, guild, ws (planned: worker, dashboard, generate)
 │   ├── scaffold/         # `kiw new` / `kiw init` templates for 8 kinds
 │   ├── shape/            # Kind detection (krewire.yaml + manuscript/ + infra/ + main.go)
-│   ├── siteconfig/       # ssg: / book: config handling
+│   ├── config/           # ssg: / book: config handling
 │   ├── buildinfo/        # version embedding
 │   ├── gomod/            # go.mod helpers
 │   └── version/          # version reporting
@@ -19,9 +19,9 @@ krewire/
 **Design decisions:**
 
 - **Kind dispatch.** `kiw info` prints detected kind; `kiw build` picks pipeline (binary / `site/` / `manuscript/`→`site/` / infra plan) based on `project.kind` or markers.
-- **Dogfooding.** `cmd/kiw` (compat: `cmd/krewire`) is built on `framework/tui` with `libs/core` exit codes and `term` output.
-- **No per-project `cmd/`.** All CLI behavior lives in `krewire/krewire`; projects have no `cmd/` binaries for build/serve/run.
-- **Binary name.** The CLI binary is `kiw`; the module remains `github.com/krewire/krewire`.
+- **Dogfooding.** `cmd/kiw` is built on `framework/tui` with `libs/core` exit codes and `term` output.
+- **No per-project `cmd/`.** All CLI behavior lives in the `kiw` CLI (`github.com/krewire/kiw`); projects have no `cmd/` binaries for build/serve/run.
+- **Binary name.** The CLI binary is `kiw`; the module is `github.com/krewire/kiw`.
 
 
 ## Conventions

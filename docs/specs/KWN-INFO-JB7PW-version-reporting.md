@@ -79,4 +79,4 @@ provides one deterministic, honest version statement.
 ## 9. References
 
 - [KWF-CMBZJ](https://github.com/krewire/framework/blob/main/docs/specs/KWF-META-CMBZJ-krewire-meta-framework.md) — Krewire Framework initial specification.
-- [krewire](https://github.com/krewire/krewire) — the reporting devtool.
+- [kiw](https://github.com/krewire/kiw) — the reporting devtool.

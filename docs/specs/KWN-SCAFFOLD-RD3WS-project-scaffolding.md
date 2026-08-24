@@ -83,4 +83,4 @@ and the variant choice is deferred to `init`.
 
 - [KWF-FGNZ9](https://github.com/krewire/framework/blob/main/docs/specs/KWF-CLI-FGNZ9-cli-configuration.md) — CLI Configuration.
 - [KWF-MFA0T](https://github.com/krewire/framework/blob/main/docs/specs/KWF-CLI-MFA0T-cli-help-usage.md) — CLI Help & Usage.
-- [krewire](https://github.com/krewire/krewire) — the scaffolding devtool.
+- [kiw](https://github.com/krewire/kiw) — the scaffolding devtool.

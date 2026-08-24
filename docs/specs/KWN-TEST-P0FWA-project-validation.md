@@ -72,4 +72,4 @@ command, one exit-code contract, structured start diagnostics.
 ## 9. References
 
 - [KWF-5XJFC](https://github.com/krewire/framework/blob/main/docs/specs/KWF-CLI-5XJFC-cli-application-model.md) — CLI Application Model.
-- [krewire](https://github.com/krewire/krewire) — the validating devtool.
+- [kiw](https://github.com/krewire/kiw) — the validating devtool.
