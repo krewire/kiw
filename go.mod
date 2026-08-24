@@ -5,7 +5,7 @@ go 1.22
 require (
 	github.com/krewire/framework v0.1.0
 	github.com/krewire/guild v0.1.0
-	github.com/krewire/libs v0.1.0
+	github.com/krewire/libs v0.2.0
 )
 
 require gopkg.in/yaml.v3 v3.0.1
@@ -16,6 +16,6 @@ require (
 )
 
 require (
-	github.com/krewire/mdbind v0.1.0
+	github.com/krewire/mdbind v0.1.1
 	github.com/yuin/goldmark v1.8.5 // indirect
 )

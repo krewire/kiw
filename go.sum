@@ -1,5 +1,13 @@
 github.com/gomarkdown/markdown v0.0.0-20260818103853-6d1f24fc3a11 h1:ot6/Kp6yjtsQjxQVufBPmTNUKrnFZ88UD9gKV38dwFw=
 github.com/gomarkdown/markdown v0.0.0-20260818103853-6d1f24fc3a11/go.mod h1:JDGcbDT52eL4fju3sZ4TeHGsQwhG9nbDV21aMyhwPoA=
+github.com/krewire/framework v0.1.0 h1:Eko7X1Io/z7oJQRXnjERvg/SonE+h0idbTT6wY30W74=
+github.com/krewire/framework v0.1.0/go.mod h1:a9JbSO2ZPgFBaNLxVqq1ENpj0M+Ic3mVKYPwWLH+OYs=
+github.com/krewire/guild v0.1.0 h1:cCmp1LHWCqIKPjNauFvYI0Md/F98kshZjZKHBi8smHQ=
+github.com/krewire/guild v0.1.0/go.mod h1:lSuL/mMp9L1LZiEZofgDYeMbI7BKhgsTb9F/MNXNLig=
+github.com/krewire/libs v0.2.0 h1:r2nx+IOCcvxSPIt5f/9DjAuTJnRFQDzFBHOepDPAfVY=
+github.com/krewire/libs v0.2.0/go.mod h1:ssYyEU43F66BY4YX7QNJBsB+eWmfR8dGuLKMDvU+0Cs=
+github.com/krewire/mdbind v0.1.1 h1:96DNGy0PdSckiEpVNQUgGLQAFT8qXdF1nRf2IpiIDi0=
+github.com/krewire/mdbind v0.1.1/go.mod h1:2+baMbWdFy/9V2FKoaYe10SVBIygZdILKVqqUr1k+tU=
 github.com/yuin/goldmark v1.8.5 h1:r6N5afV5qj/5S4UTch8agZHJ8UxNCMwX7WjkkJam2NA=
 github.com/yuin/goldmark v1.8.5/go.mod h1:ip/1k0VRfGynBgxOz0yCqHrbZXhcjxyuS66Brc7iBKg=
 golang.org/x/net v0.30.0 h1:AcW1SDZMkb8IpzCdQUaIq2sP4sZ4zw+55h6ynffypl4=
