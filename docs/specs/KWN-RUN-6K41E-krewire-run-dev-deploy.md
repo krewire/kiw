@@ -97,10 +97,10 @@ first-class without touching the existing static book/site commands.
 
 | ID          | Requirement                                                       | Priority |
 | ----------- | ----------------------------------------------------------------- | -------- |
-| RND-DEP-001 | `krewire deploy` validates the project (KWN-P0FWA) then produces a deployable artifact: `krewire build` output plus the compiled app binary in `dist/`. | Should |
-| RND-DEP-002 | `dist/` contains the binary and the exported `site/`; the app is expected to serve both via KWF-C4087 embedding. | Should |
+| RND-DEP-001 | `krewire deploy` validates the project (tests only for Go projects with `go.mod`) then produces a deployable artifact: `krewire build` output plus the compiled app binary in `.krewire/dist/`. | Should |
+| RND-DEP-002 | `.krewire/dist/` contains the binary and the exported `site/`; the app is expected to serve both via KWF-C4087 embedding. | Should |
 | RND-DEP-003 | Provide a `--target` flag listing supported targets (e.g. `binary`, `gh-pages`); unknown targets exit `core.ExitCodeUsage`. | Should |
-| RND-DEP-004 | `deploy` never publishes automatically; it only stages artifacts. Push/deploy remains a separate explicit step. | Must |
+| RND-DEP-004 | `--target gh-pages` publishes the staged site to the project's pages branch on `--remote` (default `origin`; branch autodetected `gh-deploy` → `gh-pages`, else `gh-pages`) via a throwaway clone — the user's working tree is untouched; commits use the fixed `Krewire Bot <krewire-bot@krewire.local>` identity; `--dry-run` skips tests and publishing. Binary staging alone never publishes. | Must |
 
 ### 5.5 Universal serve & shared runtime bootstrap
 
@@ -124,7 +124,8 @@ first-class without touching the existing static book/site commands.
 - S2 — In an app project, `krewire dev` restarts after editing a `*.go` file and after editing an asset.
 - S3 — In a site/book project, `run` errors with a usage diagnostic and `serve` still works untouched.
 - S4 — `krewire info` reports the detected kind and the markers used.
-- S5 — `krewire deploy` stages `dist/` with the binary + exported `site/` for a mixed app+site project.
+- S5 — `krewire deploy` stages `.krewire/dist/` with the binary + exported `site/` for a mixed app+site project.
+- S6 — `kiw deploy --target gh-pages --branch gh-deploy` fast-forwards the remote pages branch with the built site; stale files disappear (clean worktree each publish) and repeated runs are idempotent.
 
 ## 8. Related Specifications
 

@@ -16,11 +16,11 @@ import (
 
 // RegisterInit registers flags for the init command.
 func RegisterInit(fs *flag.FlagSet) {
-	fs.Bool("static", false, "equip a declarative static site (ssg: key in krewire.yaml)")
+	fs.Bool("site", false, "equip a declarative static site (ssg: key in krewire.yaml)")
 	fs.Bool("book", false, "equip a manuscript book (mdbind)")
 	fs.Bool("cli", false, "equip a command-line application (framework/tui)")
 	fs.String("template", "", "bootstrap from a remote git template (git URL)")
-	fs.String("title", "", "site title for the static and book variants")
+	fs.String("title", "", "site title for the site and book variants")
 }
 
 // RunInit equips the project in the current directory (or an optional
@@ -38,11 +38,11 @@ func RunInit(fs *flag.FlagSet) core.ExitCode {
 	}
 
 	templateURL := flagValue(fs, "template")
-	static := flagBool(fs, "static")
+	site := flagBool(fs, "site")
 	book := flagBool(fs, "book")
 	cli := flagBool(fs, "cli")
-	if count := boolCount(static, book, cli, templateURL != ""); count > 1 {
-		fmt.Fprintln(os.Stderr, "kiw init: choose one variant: --static, --book, --cli, or --template")
+	if count := boolCount(site, book, cli, templateURL != ""); count > 1 {
+		fmt.Fprintln(os.Stderr, "kiw init: choose one variant: --site, --book, --cli, or --template")
 		return core.ExitCodeUsage
 	}
 
@@ -52,7 +52,7 @@ func RunInit(fs *flag.FlagSet) core.ExitCode {
 		TemplateURL: templateURL,
 	}
 	switch {
-	case static:
+	case site:
 		opts.Variant = scaffold.VariantStatic
 	case book:
 		opts.Variant = scaffold.VariantBook

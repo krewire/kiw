@@ -18,7 +18,7 @@ kiw/
 
 **Design decisions:**
 
-- **Kind dispatch.** `kiw info` prints detected kind; `kiw build` picks pipeline (binary / `site/` / `manuscript/`→`site/` / infra plan) based on `project.kind` or markers.
+- **Kind dispatch.** `kiw info` prints detected kind; `kiw build` picks pipeline (binary / `.krewire/build` / `manuscript/`→`.krewire/build` / infra plan) based on `project.kind` or markers.
 - **Dogfooding.** `cmd/kiw` is built on `framework/tui` with `libs/core` exit codes and `term` output.
 - **No per-project `cmd/`.** All CLI behavior lives in the `kiw` CLI (`github.com/krewire/kiw`); projects have no `cmd/` binaries for build/serve/run.
 - **Binary name.** The CLI binary is `kiw`; the module is `github.com/krewire/kiw`.

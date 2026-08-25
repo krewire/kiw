@@ -33,6 +33,6 @@ func RunNew(fs *flag.FlagSet) core.ExitCode {
 	for _, path := range created {
 		fmt.Println("created " + path)
 	}
-	fmt.Println("next: cd " + name + " && kiw init [--static|--book|--cli|--template <git-url>] to equip a variant")
+	fmt.Println("next: cd " + name + " && kiw init [--site|--book|--cli|--template <git-url>] to equip a variant")
 	return core.ExitCodeSuccess
 }

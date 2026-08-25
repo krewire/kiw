@@ -201,7 +201,7 @@ func TestEquipBook(t *testing.T) {
 	}
 	assertFileContains(t, filepath.Join(dir, "krewire.yaml"), "kind: book")
 	assertFileContains(t, filepath.Join(dir, "krewire.yaml"), "title: My Book")
-	assertFileContains(t, filepath.Join(dir, "manuscript/01-introduction.md"), "# Introduction")
+	assertFileContains(t, filepath.Join(dir, "content/docs/01-introduction.md"), "# Introduction")
 	if _, err := os.Stat(filepath.Join(dir, "main.go")); !os.IsNotExist(err) {
 		t.Error("kernel main.go should be removed for a book project")
 	}

@@ -31,8 +31,8 @@ pasting files by hand. The project config must live exclusively in
 
 - G1 — Keep `krewire new <project>` minimal and framework-free.
 - G2 — Equip a kernel into a **fullstack monolith** when no variant flag is given.
-- G3 — Equip a **static site** with `--static`, configured solely via the `ssg:` key in `krewire.yaml`.
-- G4 — Equip a **manuscript book** (mdbind) with `--book`.
+- G3 — Equip a **static site** with `--site`, configured solely via the `ssg:` key in `krewire.yaml`.
+- G4 — Equip a **markdown content book** (mdbind) with `--book`.
 - G5 — Bootstrap from a remote starter with `--template <git-url>`.
 - G6 — Equip a **command-line application** built on framework/tui with `--cli`.
 - G7 — Never overwrite pre-existing project files.
@@ -51,8 +51,8 @@ pasting files by hand. The project config must live exclusively in
 | RND-INIT-002 | With no variant flag, equip the kernel into a fullstack monolith: entry `main.go` plus `internal/`, `web/`, `assets/`. | Must |
 | RND-INIT-003 | Monolith preserves the module path from the existing `go.mod` and pins framework + libs to the versions the devtool was built with (with local `replace` when run from the krewire repo). | Must |
 | RND-INIT-004 | The monolith entry point is the root `main.go` (thin entry calling `config.Load` + `app.New`), matching `krewire run` (`go build .`). | Must |
-| RND-INIT-005 | `--static` writes an `ssg:` key into `krewire.yaml` (sample layout, component, page, assets, theme) with `project.kind: site`. No `ssg.yaml` is created. | Must |
-| RND-INIT-006 | `--book` writes a `manuscript/` sample plus `project.kind: book` and book fields in `krewire.yaml`. | Must |
+| RND-INIT-005 | `--site` writes an `ssg:` key into `krewire.yaml` (sample layout, component, page, assets, theme) with `project.kind: site`. No `ssg.yaml` is created. | Must |
+| RND-INIT-006 | `--book` writes a `content/docs/` sample plus `project.kind: book` and book fields in `krewire.yaml`. | Must |
 | RND-INIT-007 | `--template <git-url>` shallow-clones the URL into the target directory and enacts the cloned files as the project; the target must be absent or empty. | Must |
 | RND-INIT-008 | Variant flags are mutually exclusive; more than one is a usage error. | Must |
 | RND-INIT-009 | Equipping a site or book variant removes the kernel's placeholder `main.go`; the project kind is pinned via `project.kind` in `krewire.yaml`. | Must |
@@ -71,10 +71,10 @@ pasting files by hand. The project config must live exclusively in
 ## 7. Success Criteria
 
 - S1 — `krewire new demo && cd demo && krewire init` yields a monolith where `krewire run` builds and serves.
-- S2 — `krewire init --static` yields a project where `krewire build` emits a site from the `ssg:` key only.
-- S3 — `krewire init --book` yields a project where `krewire build` assembles the manuscript with mdbind.
+- S2 — `krewire init --site` yields a project where `krewire build` emits a site from the `ssg:` key only.
+- S3 — `krewire init --book` yields a project where `krewire build` assembles the content/ chapters with mdbind.
 - S4 — Files beyond the kernel set are never overwritten; conflicts exit with code 2.
-- S5 — `krewire init --static --book` exits with a usage error (2).
+- S5 — `krewire init --site --book` exits with a usage error (2).
 - S6 — `krewire init --cli` yields a project where `krewire run <args>` and `krewire dev` build and run the CLI binary.
 
 ## 8. Related Specifications

@@ -15,6 +15,12 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const DefaultOutput = ".krewire/build"
+
+// DefaultInput is the default content directory consumed by the book
+// (mdbind) build, mirroring the ssg content layout.
+const DefaultInput = "content"
+
 // Config is the krewire.yaml schema consumed by the build command.
 type Config struct {
 	// Project pins the project kind when discovery is ambiguous. Empty means
@@ -32,20 +38,55 @@ type Config struct {
 	Author string `yaml:"author"`
 	// Base is the URL base the site is served under, e.g. "/docs/".
 	Base string `yaml:"base"`
-	// Input is the manuscript directory, relative to the project root.
+	// Version is the product version injected into page data (.Version) for
+	// both ssg and book pipelines, so web content never hardcodes it.
+	Version string `yaml:"version"`
+	// Input is the content directory, relative to the project root.
+	// Defaults to "content" when empty; may be overridden by krewire.yaml
+	// or the --input flag.
 	Input string `yaml:"input"`
 	// Output is the output directory, relative to the project root.
+	// Defaults to .krewire/build when empty; may be overridden by
+	// krewire.yaml or the --output/-o flag.
 	Output string `yaml:"output"`
+	// Build tunes the build pipeline: include/exclude content path globs.
+	Build BuildConfig `yaml:"build"`
 	// Nav holds optional navbar links.
 	Nav []Link `yaml:"nav"`
 	// Footer is optional footer text.
 	Footer string `yaml:"footer"`
 	// Theme configures the light/dark theme switcher.
 	Theme *Theme `yaml:"theme"`
+	// Book holds book-specific settings for the manuscript/ (mdbind) shape.
+	Book BookConfig `yaml:"book"`
 	// SSG holds the declarative SSG config. When non-nil, kiw build uses
 	// the web/ssg generator instead of mdbind. Top-level fields (Title,
 	// Author, Base, Output, Theme) are injected into the SSG config.
 	SSG *SSGConfig `yaml:"ssg"`
+}
+
+// BuildConfig tunes the build pipeline under the `build:` key.
+type BuildConfig struct {
+	// Include holds glob patterns selecting which content files build
+	// (slash-separated, ** crosses segments). Unset (nil) uses the mdbind
+	// default "**/*.md"; an empty list disables the include filter.
+	Include []string `yaml:"include"`
+	// Exclude holds glob patterns removed after include filtering. Unset
+	// (nil) uses the mdbind defaults excluding README/readme developer
+	// notes; an empty list excludes nothing.
+	Exclude []string `yaml:"exclude"`
+}
+
+// BookConfig holds book-specific settings under the `book:` key.
+type BookConfig struct {
+	// Mount places the whole book under a sub-path of the output and URL
+	// space, e.g. "/docs/" — letting a manuscript co-exist with an ssg site
+	// in one .krewire/build (progressive enhancement). Empty mounts at root.
+	Mount string `yaml:"mount"`
+	// TOC controls the generated root table-of-contents page. In a hybrid
+	// project it defaults to false (suppressed so the ssg landing page owns
+	// "/"); set `toc: true` to force it on. Standalone books always emit it.
+	TOC *bool `yaml:"toc"`
 }
 
 // IsSSG reports whether this config targets the declarative SSG mode.
@@ -128,6 +169,7 @@ func (c *Config) ToSSGConfig() *ssg.Config {
 	cfg := &ssg.Config{
 		Title:       c.Title,
 		Description: s.Description,
+		Version:     c.Version,
 		Output:      c.Output,
 		Assets:      s.Assets,
 	}

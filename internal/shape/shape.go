@@ -67,8 +67,10 @@ func Detect(dir, explicitKind string) (Result, error) {
 	if hasFile(dir, "ssg.yaml") || hasSSGKey(dir) {
 		return Result{Kind: KindSite, Marker: "krewire.yaml#ssg"}, nil
 	}
-	if isDir(dir, "manuscript") {
-		return Result{Kind: KindBook, Marker: "manuscript/"}, nil
+	for _, marker := range []string{"content", "manuscript"} {
+		if isDir(dir, marker) {
+			return Result{Kind: KindBook, Marker: marker + "/"}, nil
+		}
 	}
 	return Result{Kind: KindNone}, nil
 }

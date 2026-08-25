@@ -1,5 +1,5 @@
 // Package-level file for the declarative static site (VariantStatic):
-// kiw init --static writes a krewire.yaml whose ssg: key drives web/ssg.
+// kiw init --site writes a krewire.yaml whose ssg: key drives web/ssg.
 // No ssg.yaml is produced (KWF-PT8OD).
 package scaffold
 
@@ -33,7 +33,7 @@ func staticKrewireYamlTemplate(name, title string) string {
   kind: site
   title: %s
   description: A static site scaffolded by kiw init.
-  output: site
+  output: .krewire/build
   version: 0.1.0
 ssg:
   layouts:

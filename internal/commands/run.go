@@ -180,8 +180,8 @@ func exportSiteAssets(root string, fs *flag.FlagSet) core.ExitCode {
 	switch {
 	case cfg.IsSSG():
 		return buildSSGFromConfig(root, cfg, fs)
-	case hasDir(root, "manuscript"):
-		return buildManuscript(root, cfg, fs)
+	case hasDir(root, "content"), hasDir(root, "manuscript"):
+		return buildManuscript(root, cfg, fs, false)
 	default:
 		return core.ExitCodeSuccess
 	}

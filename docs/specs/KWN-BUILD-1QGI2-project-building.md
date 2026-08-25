@@ -29,9 +29,9 @@ the declarative config lives.
 ## 3. Goals
 
 - G1 — One command (`krewire build`) builds the current project's website.
-- G2 — Support the two standard project shapes: `ssg.yaml` and `manuscript/`.
+- G2 — Support the two standard project shapes: `ssg:`/`pages/*.kiw` (site) and `content/**` (book), and allow them to **co-exist progressively** (book → site without rewrite).
 - G3 — Resolve paths against the project root, not the working directory.
-- G4 — Delegate to the framework's ssg package or mdbind instead of reimplementing them.
+- G4 — Delegate to the framework's ssg package or mdbind instead of reimplementing them; both share `libs/markdown` and `.krewire/build` default.
 
 ## 4. Non-Goals
 
@@ -44,11 +44,13 @@ the declarative config lives.
 | ID          | Requirement                                                            | Priority |
 | ----------- | ----------------------------------------------------------------------- | -------- |
 | RND-BLD-001 | Provide `krewire build`, operating at the nearest Go module root.       | Must     |
-| RND-BLD-002 | When `krewire.yaml` contains an `ssg:` key (non-null), build it with the web/ssg generator (`ssg.BuildFromConfig`). SSG config fields (layouts, components, pages, assets, description) live under `ssg:`. | Must |
-| RND-BLD-003 | When the project contains a `manuscript/` directory (and `krewire.yaml` has no `ssg:` key), build it with the mdbind site builder (`book.Build`). | Must |
+| RND-BLD-002 | When `krewire.yaml` contains an `ssg:` key (non-null) or a `pages/` directory exists, build it with the web/ssg generator (`ssg.BuildFromConfig` / `ssg.LoadFromDir`). SSG config fields (layouts, components, pages, assets, description) live under `ssg:`. | Must |
+| RND-BLD-003 | When the project contains a `content/` directory (legacy `manuscript/` accepted), build it with the mdbind site builder (`book.Build`); default input `content`, configurable via krewire.yaml `input:` or `--input`. | Must |
+| RND-BLD-014 | When both `ssg`/`pages/` and `content/` are present, build **both** into the same output (`.krewire/build` by default) — progressive enhancement without rewrite; the book suppresses its root TOC (`book.toc` override) so the ssg landing owns "/". | Must |
+| RND-BLD-015 | Content include/exclude path globs resolve flag > krewire.yaml `build.include/exclude` > mdbind defaults (include `**/*.md`; exclude `**/README.md`, `**/readme.md`). An explicitly empty list disables that filter side. | Must |
 | RND-BLD-013 | `krewire.yaml` is the single config file for all project shapes. Top-level fields (`title`, `author`, `base`, `output`, `theme`, `nav`, `footer`) are shared. SSG-specific configuration lives under the `ssg:` key. | Must |
-| RND-BLD-004 | Default the output to `site`, resolved relative to the project root.   | Must |
-| RND-BLD-005 | Support `--output`, `--base`, `--title`, `--author`, and `--theme` flags. | Must |
+| RND-BLD-004 | Default the output to `.krewire/build`, resolved relative to the project root. | Must |
+| RND-BLD-005 | Support `--output` (`-o`), `--base`, `--title`, `--author`, and `--theme` flags. | Must |
 | RND-BLD-006 | Default the site title to the project name (last segment of the module path). | Must |
 | RND-BLD-007 | Print each created path on success, like `mdbind build`.               | Must |
 | RND-BLD-008 | Exit with a usage error when neither project shape is present.          | Must |
@@ -66,11 +68,13 @@ the declarative config lives.
 
 ## 7. Success Criteria
 
-- S1 — In a project with a `manuscript/`, `krewire build` produces `site/` with mdbind output.
-- S2 — In a project with only `cmd/site`, `krewire build` runs it with the output directory.
-- S3 — Flags override defaults and relative paths resolve against the project root.
-- S4 — A `krewire.yaml` configures title, nav, footer, base, and palette without a project-specific cmd.
-- S5 — Running `krewire build` outside a Krewire project fails with a clear usage message.
+- S1 — In a project with a `content/`, `krewire build` produces `.krewire/build` with mdbind output; README/readme notes are skipped by default.
+- S2 — In a project with `pages/*.kiw` or `ssg:` , `krewire build` produces `.krewire/build` via `ssg`.
+- S3 — In a project with **both** `content/` and `ssg:`/`pages/`, `krewire build` merges both into the same `.krewire/build` (e.g. `index.html` from ssg + `docs/*.html` from book) without requiring a rewrite.
+- S4 — Flags (`--output/-o`, `--base`, etc.) override defaults and relative paths resolve against the project root.
+- S5 — A `krewire.yaml` configures title, nav, footer, base, and palette without a project-specific cmd.
+- S6 — Running `krewire build` outside a Krewire project fails with a clear usage message.
+- S7 — A `go.mod` with `require github.com/krewire/framework` + `require github.com/krewire/mdbind` builds via `kiw build` without import cycle.
 
 ## 8. Related Specifications
 
@@ -78,6 +82,8 @@ the declarative config lives.
 | --------- | ---------------------------------------------- |
 | [KWN-Z0VFC](./KWN-DEVTOOL-Z0VFC-krewire-devtool.md) | Krewire Devtool — Initial Specification |
 | [KWM-FX9H2](https://github.com/krewire/mdbind/blob/main/docs/specs/KWM-BUILDER-FX9H2-mdbind-site-builder.md) | mdbind Site Builder |
+| [KWL-Q3N8P](https://github.com/krewire/libs/blob/main/docs/specs/KWL-MARKDOWN-Q3N8P-shared-markdown-renderer.md) | Shared Markdown Renderer |
+| [KWF-PT8OD](https://github.com/krewire/framework/blob/main/docs/specs/KWF-SSG-PT8OD-static-site-generator.md) | Static Site Generator |
 
 ## 9. References
 
