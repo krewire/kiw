@@ -4,7 +4,7 @@ package version
 import "github.com/krewire/libs/core"
 
 // Version is the semantic version of the kiw devtool.
-var Version = core.MustParseVersion("0.3.2")
+var Version = core.MustParseVersion("0.3.3")
 
 // VersionString returns the version as a string for UI display.
 func VersionString() string { return Version.String() }
