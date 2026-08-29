@@ -209,14 +209,28 @@ func exportSiteAssets(root string, fs *flag.FlagSet) core.ExitCode {
 	if err != nil {
 		return fail(err)
 	}
-	switch {
-	case cfg.IsSSG():
-		return buildSSGFromConfig(root, cfg, fs)
-	case hasDir(root, "content"), hasDir(root, "manuscript"):
-		return buildManuscript(root, cfg, fs, false)
-	default:
+	hasPages := hasDir(root, "pages")
+	hasSSG := cfg.IsSSG()
+	hasBook := hasDir(root, "content") || hasDir(root, "manuscript")
+	if !hasPages && !hasSSG && !hasBook {
 		return core.ExitCodeSuccess
 	}
+	// Mirror RunBuild: SSG from file (pages/) takes precedence over ssg: config
+	if hasPages {
+		if code := buildSSGFromFile(root, cfg, fs); code != core.ExitCodeSuccess {
+			return code
+		}
+	} else if hasSSG {
+		if code := buildSSGFromConfig(root, cfg, fs); code != core.ExitCodeSuccess {
+			return code
+		}
+	}
+	if hasBook {
+		if code := buildManuscript(root, cfg, fs, hasPages || hasSSG); code != core.ExitCodeSuccess {
+			return code
+		}
+	}
+	return core.ExitCodeSuccess
 }
 
 // Tests for KWN-SCRIPT-9F3KQ
