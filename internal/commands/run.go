@@ -8,6 +8,9 @@ import (
 	"os/exec"
 	"os/signal"
 	"path/filepath"
+	"runtime"
+	"sort"
+	"strings"
 	"syscall"
 
 	"github.com/krewire/kiw/internal/config"
@@ -26,15 +29,44 @@ func RegisterRun(fs *flag.FlagSet) {
 // APP_ADDR, and forwards SIGINT/SIGTERM so the app's graceful shutdown runs
 // inside the app. Site and book projects are rejected with guidance to use
 // build + serve.
-// RunRun builds and runs a fullstack app in production mode: it compiles the
-// project into a temp binary, executes it passing the listen address through
-// APP_ADDR, and forwards SIGINT/SIGTERM so the app's graceful shutdown runs
-// inside the app. Site and book projects are rejected with guidance to use
-// build + serve.
+//
+// Extended by KWN-SCRIPT-9F3KQ: when the first positional argument is a Go
+// file path it runs `go run <file> -- args` (KWN-SCR-001); when it matches
+// `scripts.<task>` in krewire.yaml it runs the shell command (KWN-SCR-002).
+// Precedence is file > script > project (KWN-SCR-004).
 func RunRun(fs *flag.FlagSet) core.ExitCode {
 	rt, code := bootRuntime(fs)
 	if code != core.ExitCodeSuccess {
 		return code
+	}
+
+	args := fs.Args()
+	if len(args) > 0 {
+		first := args[0]
+		isFile := isGoFileArg(rt.root, first)
+		_, isScript := rt.cfg.Scripts[first]
+		if isFile && isScript {
+			fmt.Fprintf(os.Stderr, "warning: both file and task %q exist; running file\n", first)
+		}
+		if isFile {
+			return runGoFile(rt, first, args[1:])
+		}
+		if isScript {
+			return runScript(rt, first, args[1:])
+		}
+		if strings.HasSuffix(first, ".go") {
+			fmt.Fprintf(os.Stderr, "kiw run: file %q not found\n", first)
+			return core.ExitCodeUsage
+		}
+		if len(rt.cfg.Scripts) > 0 && isTaskLike(first) {
+			// Unknown task — only error if project is not a runnable app/cli,
+			// otherwise treat as CLI args for backward compat (KWN-SCR-003).
+			// Peek detection without fully booting: check for main.go.
+			if !hasDir(rt.root, "cmd") && !hasFile(rt.root, "main.go") {
+				fmt.Fprintf(os.Stderr, "kiw run: unknown task %q\nAvailable tasks: %s\n", first, formatTasks(rt.cfg.Scripts))
+				return core.ExitCodeUsage
+			}
+		}
 	}
 
 	explicit := firstNonEmpty(flagValue(fs, "kind"), rt.cfg.Kind())
@@ -185,4 +217,93 @@ func exportSiteAssets(root string, fs *flag.FlagSet) core.ExitCode {
 	default:
 		return core.ExitCodeSuccess
 	}
+}
+
+// Tests for KWN-SCRIPT-9F3KQ
+// Spec: KWN-SCRIPT-9F3KQ KWN-SCR-001 Scope: Module
+func isGoFileArg(root, arg string) bool {
+	if !strings.HasSuffix(arg, ".go") {
+		return false
+	}
+	path := arg
+	if !filepath.IsAbs(path) {
+		path = filepath.Join(root, arg)
+	}
+	info, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+	return !info.IsDir()
+}
+
+// Spec: KWN-SCRIPT-9F3KQ KWN-SCR-001 Scope: Module
+func runGoFile(rt *runtimeEnv, path string, extraArgs []string) core.ExitCode {
+	if len(extraArgs) > 0 && extraArgs[0] == "--" {
+		extraArgs = extraArgs[1:]
+	}
+	args := []string{"run", path}
+	args = append(args, extraArgs...)
+	slog.Info("running go file", "path", path)
+	cmd := exec.Command("go", args...)
+	cmd.Dir = rt.root
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Env = childEnviron(os.Environ(), "", rt.env, rt.debug)
+	if err := cmd.Start(); err != nil {
+		return fail(err)
+	}
+	return waitChild(cmd)
+}
+
+// Spec: KWN-SCRIPT-9F3KQ KWN-SCR-002 Scope: Module
+func runScript(rt *runtimeEnv, task string, extraArgs []string) core.ExitCode {
+	script, ok := rt.cfg.Scripts[task]
+	if !ok {
+		fmt.Fprintf(os.Stderr, "kiw run: unknown task %q\nAvailable tasks: %s\n", task, formatTasks(rt.cfg.Scripts))
+		return core.ExitCodeUsage
+	}
+	if len(extraArgs) > 0 && extraArgs[0] == "--" {
+		extraArgs = extraArgs[1:]
+	}
+	if len(extraArgs) > 0 {
+		script = script + " " + strings.Join(extraArgs, " ")
+	}
+	slog.Info("running script", "task", task, "command", script)
+	var cmd *exec.Cmd
+	if runtime.GOOS == "windows" {
+		cmd = exec.Command("cmd", "/C", script)
+	} else {
+		cmd = exec.Command("sh", "-c", script)
+	}
+	cmd.Dir = rt.root
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Env = childEnviron(os.Environ(), "", rt.env, rt.debug)
+	if err := cmd.Start(); err != nil {
+		return fail(err)
+	}
+	return waitChild(cmd)
+}
+
+// Spec: KWN-SCRIPT-9F3KQ KWN-SCR-004 Scope: Module
+func isTaskLike(s string) bool {
+	if s == "" {
+		return false
+	}
+	if strings.Contains(s, "/") || strings.Contains(s, "\\") {
+		return false
+	}
+	if strings.HasSuffix(s, ".go") {
+		return false
+	}
+	return true
+}
+
+func formatTasks(m map[string]string) string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return strings.Join(keys, ", ")
 }

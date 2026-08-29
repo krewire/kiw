@@ -44,7 +44,7 @@ func writeFile(t *testing.T, path, content string) {
 	}
 }
 
-// Spec: KWN-Q3M8V WS-CMD-001 Scope: Func
+// Spec: KWN-Q3M8V WS-CMD-001 Scope: Unit
 func TestKWN_WS_CMD_001_RunWs_DispatchesHelpAndRejectsUnknown(t *testing.T) {
 	if _, code := captureStdout(t, func() core.ExitCode { return RunWs(newWsFlagSet("help")) }); code != core.ExitCodeUsage {
 		t.Errorf("help exit code = %v, want Usage", code)
@@ -54,7 +54,7 @@ func TestKWN_WS_CMD_001_RunWs_DispatchesHelpAndRejectsUnknown(t *testing.T) {
 	}
 }
 
-// Spec: KWN-Q3M8V WS-CMD-002 Scope: Func
+// Spec: KWN-Q3M8V WS-CMD-002 Scope: Unit
 func TestKWN_WS_CMD_002_FindWorkspaceRoot_ClassifiesGoWorkAndMonorepo(t *testing.T) {
 	hub := t.TempDir()
 	writeFile(t, filepath.Join(hub, "go.work"), "go 1.26\n\nuse (\n\t./a\n\t./b\n)\n")
@@ -79,7 +79,7 @@ func TestKWN_WS_CMD_002_FindWorkspaceRoot_ClassifiesGoWorkAndMonorepo(t *testing
 	}
 }
 
-// Spec: KWN-Q3M8V WS-CMD-003 Scope: Func
+// Spec: KWN-Q3M8V WS-CMD-003 Scope: Unit
 func TestKWN_WS_CMD_003_RunWsInfo_PrintsRootTypeAndMembers(t *testing.T) {
 	solo := t.TempDir()
 	writeFile(t, filepath.Join(solo, "go.mod"), "module example.com/solo\n")
@@ -96,7 +96,7 @@ func TestKWN_WS_CMD_003_RunWsInfo_PrintsRootTypeAndMembers(t *testing.T) {
 	}
 }
 
-// Spec: KWN-Q3M8V WS-CMD-004 Scope: Func
+// Spec: KWN-Q3M8V WS-CMD-004 Scope: Unit
 func TestKWN_WS_CMD_004_RunWsList_RendersProjectKindModuleTable(t *testing.T) {
 	hub := t.TempDir()
 	writeFile(t, filepath.Join(hub, "go.mod"), "module example.com/hub\n")
@@ -118,7 +118,7 @@ func TestKWN_WS_CMD_004_RunWsList_RendersProjectKindModuleTable(t *testing.T) {
 	}
 }
 
-// Spec: KWN-Q3M8V WS-CMD-005 Scope: Func
+// Spec: KWN-Q3M8V WS-CMD-005 Scope: Unit
 func TestKWN_WS_CMD_005_RunWsAddRemove_UsageWithoutArgsOrGoWork(t *testing.T) {
 	chdir(t, t.TempDir())
 
@@ -133,7 +133,7 @@ func TestKWN_WS_CMD_005_RunWsAddRemove_UsageWithoutArgsOrGoWork(t *testing.T) {
 	}
 }
 
-// Spec: KWN-Q3M8V WS-CMD-006 Scope: Func
+// Spec: KWN-Q3M8V WS-CMD-006 Scope: Unit
 func TestKWN_WS_CMD_006_RunWsSync_SucceedsInTrivialWorkspace(t *testing.T) {
 	hub := t.TempDir()
 	writeFile(t, filepath.Join(hub, "go.mod"), "module example.com/hub\n")
@@ -145,7 +145,7 @@ func TestKWN_WS_CMD_006_RunWsSync_SucceedsInTrivialWorkspace(t *testing.T) {
 	}
 }
 
-// Spec: KWN-Q3M8V WS-CMD-007 Scope: Func
+// Spec: KWN-Q3M8V WS-CMD-007 Scope: Unit
 func TestKWN_WS_CMD_007_RunWsExec_AggregatesMemberFailures(t *testing.T) {
 	hub := t.TempDir()
 	writeFile(t, filepath.Join(hub, "good", "go.mod"), "module example.com/good\n")

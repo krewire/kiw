@@ -12,20 +12,23 @@ import (
 
 func main() {
 	app := tui.NewApp("kiw", version.VersionString()).
-		Command(tui.NewCommand("version", "print the krewire CLI and framework versions", nil, commands.RunVersion)).
-		Command(tui.NewCommand("info", "print environment and project information", nil, commands.RunInfo)).
-		Command(tui.NewCommand("new", "scaffold a minimal Krewire project kernel", commands.RegisterNew, commands.RunNew)).
-		Command(tui.NewCommand("build", "build the current project's website", commands.RegisterBuild, commands.RunBuild)).
-		Command(tui.NewCommand("serve", "preview the current project's website over HTTP", commands.RegisterServe, commands.RunServe)).
-		Command(tui.NewCommand("init", "equip the project with a variant: monolith, --site, --book, --cli, or --template", commands.RegisterInit, commands.RunInit)).
-		Command(tui.NewCommand("test", "run the tests of the current project", commands.RegisterTest, commands.RunTest)).
-		Command(tui.NewCommand("vet", "run go vet on the current project", nil, commands.RunVet)).
-		Command(tui.NewCommand("fmt", "check formatting with gofmt/go fmt", commands.RegisterFmt, commands.RunFmt)).
-		Command(tui.NewCommand("run", "build and run the current app", commands.RegisterRun, commands.RunRun)).
-		Command(tui.NewCommand("dev", "run the current app in dev mode with auto-restart", commands.RegisterDev, commands.RunDev)).
-		Command(tui.NewCommand("deploy", "stage deployable artifacts in dist/", commands.RegisterDeploy, commands.RunDeploy)).
-		Command(tui.NewCommand("guild", "install the Guild AI agent template into a project", commands.RegisterGuild, commands.RunGuild)).
-		Command(tui.NewCommand("ws", "workspace for monorepo, multi-repo, multi-project, microservices", commands.RegisterWs, commands.RunWs))
+		WithDescription("One CLI for every workload — site, book, app, worker, service, infra").
+		Command(tui.NewCommand("version", "print CLI and framework versions", nil, commands.RunVersion).WithGroup("inspect").WithExample("kiw version")).
+		Command(tui.NewCommand("info", "print environment and project information", nil, commands.RunInfo).WithGroup("inspect").WithExample("kiw info")).
+		Command(tui.NewCommand("new", "scaffold a minimal Krewire project kernel", commands.RegisterNew, commands.RunNew).WithGroup("project").WithExample("kiw new my-site")).
+		Command(tui.NewCommand("init", "equip the project with a variant: monolith, --site, --book, --cli, or --template", commands.RegisterInit, commands.RunInit).WithGroup("project").WithExample("kiw init --site")).
+		Command(tui.NewCommand("build", "build the current project's website", commands.RegisterBuild, commands.RunBuild).WithGroup("build").WithExample("kiw build")).
+		Command(tui.NewCommand("serve", "preview the current project's website over HTTP", commands.RegisterServe, commands.RunServe).WithGroup("build").WithExample("kiw serve --port 3000")).
+		Command(tui.NewCommand("run", "build and run the current app, a Go file, or a task from krewire.yaml", commands.RegisterRun, commands.RunRun).WithGroup("develop").WithExample("kiw run [task|path/to/file.go] [-- args]")).
+		Command(tui.NewCommand("dev", "run the current app in dev mode with auto-restart", commands.RegisterDev, commands.RunDev).WithGroup("develop").WithExample("kiw dev")).
+		Command(tui.NewCommand("test", "run the tests of the current project", commands.RegisterTest, commands.RunTest).WithGroup("develop").WithExample("kiw test")).
+		Command(tui.NewCommand("vet", "run go vet on the current project", nil, commands.RunVet).WithGroup("develop").WithExample("kiw vet")).
+		Command(tui.NewCommand("fmt", "check formatting with gofmt/go fmt", commands.RegisterFmt, commands.RunFmt).WithGroup("develop").WithExample("kiw fmt --write")).
+		Command(tui.NewCommand("add", "add a package or plugin (package@version, @latest for latest)", commands.RegisterAdd, commands.RunAdd).WithGroup("project").WithExample("kiw add twcss@latest")).
+		Command(tui.NewCommand("remove", "remove a package or plugin", commands.RegisterRemove, commands.RunRemove).WithGroup("project").WithExample("kiw remove twcss")).
+		Command(tui.NewCommand("deploy", "stage deployable artifacts in dist/", commands.RegisterDeploy, commands.RunDeploy).WithGroup("ship").WithExample("kiw deploy --preview")).
+		Command(tui.NewCommand("ws", "workspace for monorepo, multi-repo, multi-project, microservices", commands.RegisterWs, commands.RunWs).WithGroup("ship").WithExample("kiw ws help")).
+		Command(tui.NewCommand("guild", "install the Guild AI agent template into a project", commands.RegisterGuild, commands.RunGuild).WithGroup("ship").WithExample("kiw guild install"))
 
 	os.Exit(int(app.Run(os.Args[1:])))
 }

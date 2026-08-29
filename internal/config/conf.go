@@ -63,6 +63,10 @@ type Config struct {
 	// the web/ssg generator instead of mdbind. Top-level fields (Title,
 	// Author, Base, Output, Theme) are injected into the SSG config.
 	SSG *SSGConfig `yaml:"ssg"`
+	// Scripts holds named shell commands runnable via `kiw run <task>`.
+	// Keys are task names, values are shell commands executed with `sh -c`
+	// (Unix) or `cmd /C` (Windows). Optional, zero-value nil means no tasks.
+	Scripts map[string]string `yaml:"scripts"`
 }
 
 // BuildConfig tunes the build pipeline under the `build:` key.

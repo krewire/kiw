@@ -9,7 +9,7 @@ import (
 	"github.com/krewire/libs/core"
 )
 
-// Spec: KWL-K4T7W KWL-ENVV-006 Scope: Func
+// Spec: KWL-K4T7W KWL-ENVV-006 Scope: Unit
 func TestKWL_ENVV_006_ChildEnviron_ExportsRVEnvAndDebug(t *testing.T) {
 	base := []string{"PATH=/bin"}
 	got := childEnviron(base, ":8080", core.EnvTesting, true)
@@ -25,7 +25,7 @@ func TestKWL_ENVV_006_ChildEnviron_ExportsRVEnvAndDebug(t *testing.T) {
 	}
 }
 
-// Spec: KWL-K4T7W KWL-ENVV-007 Scope: Func
+// Spec: KWL-K4T7W KWL-ENVV-007 Scope: Unit
 func TestKWL_ENVV_007_UsageOrFail_MapsUsageErrorsToExit2(t *testing.T) {
 	if got := usageOrFail(core.UsageError("bad")); got != core.ExitCodeUsage {
 		t.Errorf("usageOrFail(UsageError) = %d, want %d", got, core.ExitCodeUsage)

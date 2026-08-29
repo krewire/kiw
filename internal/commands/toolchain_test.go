@@ -3,7 +3,7 @@ package commands
 
 import "testing"
 
-// Spec: KWN-TEST-P0FWA Scope: Package
+// Spec: KWN-TEST-P0FWA Scope: Unit
 func TestIsSpecID_Valid(t *testing.T) {
 	cases := []struct {
 		in   string

@@ -7,7 +7,7 @@ import (
 
 	"github.com/krewire/kiw/internal/config"
 	"github.com/krewire/libs/core"
-	"github.com/krewire/libs/log"
+	"github.com/krewire/libs/vein"
 )
 
 // debugEnabled records whether the current command resolved debug mode, so
@@ -17,10 +17,11 @@ var debugEnabled bool
 // runtimeEnv is the resolved local-run context shared by serve, run, and dev
 // (KWN-6K41E RND-SRV-002): the module root, its configuration, and the
 // effective environment/debug switches (KWL-K4T7W).
+// Vein is applied: env and diagnostics via vein.
 type runtimeEnv struct {
 	root  string
 	cfg   *config.Config
-	env   core.Env
+	env   vein.Env
 	debug bool
 }
 
@@ -36,10 +37,10 @@ func bootRuntime(fs *flag.FlagSet) (*runtimeEnv, core.ExitCode) {
 	}
 	c, err := config.Load(root)
 	if err != nil {
-		return nil, fail(core.WithStack(err))
+		return nil, fail(vein.WithStack(err))
 	}
 	if err := c.LoadDotEnv(root); err != nil {
-		return nil, fail(core.WithStack(err))
+		return nil, fail(vein.WithStack(err))
 	}
 	env, err := c.ResolveEnv(flagValue(fs, "env"))
 	if err != nil {
@@ -47,8 +48,8 @@ func bootRuntime(fs *flag.FlagSet) (*runtimeEnv, core.ExitCode) {
 	}
 	debug := c.ResolveDebug(flagValue(fs, "debug"), flagProvided(fs, "debug"))
 	debugEnabled = debug
-	log.Install(env, debug)
-	return &runtimeEnv{root: root, cfg: c, env: env, debug: debug}, core.ExitCodeSuccess
+	vein.Install(vein.Env(env), debug)
+	return &runtimeEnv{root: root, cfg: c, env: vein.Env(env), debug: debug}, core.ExitCodeSuccess
 }
 
 // registerRuntimeFlags registers the flags shared by every command that

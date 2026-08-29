@@ -1,0 +1,12 @@
+# Compiled binary
+/testtw
+
+# Krewire build outputs
+site/
+.krewire/
+
+# Editor and OS noise
+.idea/
+.vscode/
+*.swp
+.DS_Store

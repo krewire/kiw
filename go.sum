@@ -2,8 +2,6 @@ github.com/krewire/framework v0.3.1 h1:+/2CIbSYuIQywbYAvm7yu59CsIsA7Iu/LIhTFPuU4
 github.com/krewire/framework v0.3.1/go.mod h1:EumAovNn6Dhlqd2sLwYCu00MDnz4c9s1wkLrF8Glsqs=
 github.com/krewire/guild v0.1.0 h1:cCmp1LHWCqIKPjNauFvYI0Md/F98kshZjZKHBi8smHQ=
 github.com/krewire/guild v0.1.0/go.mod h1:lSuL/mMp9L1LZiEZofgDYeMbI7BKhgsTb9F/MNXNLig=
-github.com/krewire/libs v0.3.0 h1:spSiQSRsOo8HZK2L+Fpjvlh9PZ3d7CtvMR0ySPVW9dM=
-github.com/krewire/libs v0.3.0/go.mod h1:Ip660s+SIQG8SA8L4yuoyTN+IATcDBUPY95ga3UnTVk=
 github.com/krewire/mdbind v0.2.0 h1:RzVHZ2JnqbW4NqJvskKcwB+rBBA2Sws9bszBCzTEH2c=
 github.com/krewire/mdbind v0.2.0/go.mod h1:+Igxw49TqI1g8J15nwt7sKyplF0wPm8tVl1DF0mXXP4=
 github.com/yuin/goldmark v1.8.5 h1:r6N5afV5qj/5S4UTch8agZHJ8UxNCMwX7WjkkJam2NA=

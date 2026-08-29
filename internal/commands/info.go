@@ -6,12 +6,14 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"sort"
 
 	"github.com/krewire/kiw/internal/config"
 	"github.com/krewire/kiw/internal/gomod"
 	"github.com/krewire/kiw/internal/shape"
 	"github.com/krewire/kiw/internal/version"
 	"github.com/krewire/libs/core"
+	"github.com/krewire/libs/term"
 )
 
 func RunInfo(_ *flag.FlagSet) core.ExitCode {
@@ -26,36 +28,84 @@ func RunInfo(_ *flag.FlagSet) core.ExitCode {
 		return fail(err)
 	}
 
-	fmt.Println("Environment")
-	fmt.Printf("  CLI              Krewire v%s\n", version.Version)
-	fmt.Printf("  Framework        Krewire Framework %s\n", qualifiedVersion(ModFramework))
-	fmt.Printf("  Libraries        %s %s\n", ModLibs, qualifiedVersion(ModLibs))
-	fmt.Printf("  Go               %s (%s/%s)\n", runtime.Version(), runtime.GOOS, runtime.GOARCH)
-	fmt.Printf("  Env              %s\n", resolvedEnvLabel(cfg))
-	fmt.Printf("  Debug            %t\n", cfg.ResolveDebug("", false))
+	tm := term.NewTerminal()
+	dim := func(s string) string { return tm.Paint(s, term.ColorDefault, []term.Style{term.StyleDim}) }
+	boldDim := func(s string) string {
+		return tm.Paint(s, term.ColorDefault, []term.Style{term.StyleBold, term.StyleDim})
+	}
+	cyan := func(s string) string { return tm.Paint(s, term.ColorCyan, nil) }
+	green := func(s string) string { return tm.Paint(s, term.ColorGreen, nil) }
+	yellow := func(s string) string { return tm.Paint(s, term.ColorYellow, nil) }
 
-	modulePath := "<none>"
-	usesKrewire := "no"
+	fmt.Println(boldDim("─ Environment ─────────────────────────────────"))
+	printKV(tm, "CLI", cyan("Krewire v"+version.Version.String()), dim)
+	printKV(tm, "Framework", cyan("Krewire Framework "+qualifiedVersion(ModFramework)), dim)
+	printKV(tm, "Libraries", cyan(ModLibs+" "+qualifiedVersion(ModLibs)), dim)
+	printKV(tm, "Go", dim(runtime.Version()+" ")+yellow("("+runtime.GOOS+"/"+runtime.GOARCH+")"), dim)
+	printKV(tm, "Env", green(resolvedEnvLabel(cfg)), dim)
+	printKV(tm, "Debug", dim(fmt.Sprintf("%t", cfg.ResolveDebug("", false))), dim)
+
+	fmt.Println()
+	fmt.Println(boldDim("─ Project ────────────────────────────────────"))
+	printKV(tm, "Directory", dim(dir), dim)
+	modulePath := dim("<none>")
+	usesKrewire := dim("no")
 	if mod != nil {
-		modulePath = mod.Path
+		modulePath = cyan(mod.Path)
 		if mod.UsesKrewire() {
-			usesKrewire = "yes"
+			usesKrewire = green("yes")
+		} else {
+			usesKrewire = yellow("no")
+		}
+	}
+	printKV(tm, "Module path", modulePath, dim)
+	printKV(tm, "Built on Krewire", usesKrewire, dim)
+	kindStr := cyan(res.String())
+	if res.Kind == shape.KindNone {
+		kindStr = yellow(res.String())
+	}
+	printKV(tm, "Project kind", kindStr, dim)
+	if res.Marker != "" {
+		printKV(tm, "Detected by", dim(res.Marker), dim)
+	}
+
+	if len(cfg.Scripts) > 0 {
+		fmt.Println()
+		fmt.Println(boldDim("─ Scripts ──────────────────────────────────"))
+		keys := make([]string, 0, len(cfg.Scripts))
+		for k := range cfg.Scripts {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for _, k := range keys {
+			printKV(tm, k, dim(cfg.Scripts[k]), dim)
 		}
 	}
 
-	fmt.Println("Project")
-	fmt.Printf("  Directory        %s\n", dir)
-	fmt.Printf("  Module path      %s\n", modulePath)
-	fmt.Printf("  Built on Krewire  %s\n", usesKrewire)
-	fmt.Printf("  Project kind     %s\n", res)
-	if res.Marker != "" {
-		fmt.Printf("  Detected by      %s\n", res.Marker)
-	}
-
 	if res.Kind == shape.KindApp {
-		printAppDirs(dir, cfg)
+		fmt.Println()
+		fmt.Println(boldDim("─ Directories ────────────────────────────────"))
+		printAppDirsStyled(dir, cfg, tm)
 	}
 	return core.ExitCodeSuccess
+}
+
+func printKV(tm *term.Terminal, key, value string, dim func(string) string) {
+	_ = tm
+	fmt.Printf("  %-16s %s\n", dim(key), value)
+}
+
+func printAppDirsStyled(root string, cfg *config.Config, tm *term.Terminal) {
+	dirs := resolveDirs(cfg)
+	dim := func(s string) string { return tm.Paint(s, term.ColorDefault, []term.Style{term.StyleDim}) }
+	for name, path := range dirs {
+		full := filepath.Join(root, path)
+		status := tm.Paint("exists", term.ColorGreen, nil)
+		if _, err := os.Stat(full); err != nil {
+			status = tm.Paint("missing", term.ColorYellow, nil)
+		}
+		fmt.Printf("  %-16s %s %s\n", dim(name+":"), path, "("+status+")")
+	}
 }
 
 // resolvedEnvLabel renders the effective environment for display, marking an

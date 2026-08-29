@@ -8,6 +8,7 @@ import (
 
 	"github.com/krewire/kiw/internal/scaffold"
 	"github.com/krewire/libs/core"
+	"github.com/krewire/libs/vein"
 )
 
 func flagValue(fs *flag.FlagSet, name string) string {
@@ -18,7 +19,7 @@ func flagValue(fs *flag.FlagSet, name string) string {
 }
 
 func commandError(err error) core.ExitCode {
-	fmt.Fprint(os.Stderr, core.FormatTree(err))
+	fmt.Fprint(os.Stderr, vein.FormatTree(err))
 	switch {
 	case errors.Is(err, scaffold.ErrInvalidName),
 		errors.Is(err, scaffold.ErrProjectExists),
@@ -31,7 +32,7 @@ func commandError(err error) core.ExitCode {
 }
 
 func fail(err error) core.ExitCode {
-	fmt.Fprint(os.Stderr, core.FormatTree(err))
+	fmt.Fprint(os.Stderr, vein.FormatTree(err))
 	printStackIfDebug(err)
 	return core.ExitCodeFailure
 }
@@ -42,12 +43,12 @@ func printStackIfDebug(err error) {
 	if !debugEnabled {
 		return
 	}
-	frames := core.StackOf(err)
+	frames := vein.StackOf(err)
 	if len(frames) == 0 {
 		return
 	}
 	fmt.Fprintln(os.Stderr, "stack trace (newest first):")
-	fmt.Fprint(os.Stderr, core.FormatStack(frames))
+	fmt.Fprint(os.Stderr, vein.FormatStack(frames))
 }
 
 // usageOrFail prints err and maps core usage errors to exit code 2
@@ -55,7 +56,7 @@ func printStackIfDebug(err error) {
 func usageOrFail(err error) core.ExitCode {
 	var ce interface{ ExitCode() core.ExitCode }
 	if errors.As(err, &ce) && ce.ExitCode() == core.ExitCodeUsage {
-		fmt.Fprint(os.Stderr, core.FormatTree(err))
+		fmt.Fprint(os.Stderr, vein.FormatTree(err))
 		printStackIfDebug(err)
 		return core.ExitCodeUsage
 	}
@@ -84,7 +85,8 @@ func truthStr(b bool) string {
 
 // childEnviron composes the child-process environment for run and dev,
 // exporting APP_ADDR plus KIW_ENV/KIW_DEBUG (KWL-K4T7W KWL-ENVV-006).
-func childEnviron(base []string, addr string, env core.Env, debug bool) []string {
+// Vein is applied: env via vein.Env.
+func childEnviron(base []string, addr string, env vein.Env, debug bool) []string {
 	e := append([]string(nil), base...)
 	if addr != "" {
 		e = append(e, "APP_ADDR="+addr)

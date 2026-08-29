@@ -54,14 +54,14 @@ raw toolchain commands.
 
 | ID         | Requirement                                                                                                   | Priority | Scope |
 | ---------- | ------------------------------------------------------------------------------------------------------------- | -------- | ----- |
-| WS-CMD-001 | `kiw ws <sub>` dispatches to `info`, `list`/`ls`, `add`, `remove`/`rm`, `sync`, `exec`; empty arg or `help`/`-h`/`--help` prints usage with exit code Usage; an unknown sub-command reports it on stderr then prints usage with exit code Usage. | Must | Func |
-| WS-CMD-002 | Workspace detection walks upward from the current directory: a directory containing `go.work` classifies as multi-repo with members parsed from both block-form and single-line `use` directives; a bare `go.mod` root classifies as monorepo with itself as sole member; neither yields unknown. | Must | Func |
-| WS-CMD-003 | `ws info` prints the workspace root path, its classification, every member, and the `go.work` location when present. | Must | Func |
-| WS-CMD-004 | `ws list` prints one PROJECT/KIND/MODULE row per member, resolving module paths via the go.mod reader and kinds via project-shape detection. | Must | Func |
-| WS-CMD-005 | `ws add <path>` and `ws remove <path>` mutate `go.work` through `go work use` / `go work edit -dropuse` executed at the workspace root; a missing argument or a non-`go.work` layout exits Usage without invoking the toolchain. | Must | Func |
-| WS-CMD-006 | `ws sync` runs `go work sync` at the workspace root.                                                            | Must | Func |
-| WS-CMD-007 | `ws exec [--] <cmd> [args…]` runs the command inside every member that has a `go.mod`, streaming output live, collecting failed members, and exiting Failure when at least one member failed; a missing command exits Usage. | Must | Func |
-| WS-CMD-008 | The help text documents all sub-commands, runnable examples, and the four workspace types (monorepo, multi-repo, multi-project, microservices). | Should | Func |
+| WS-CMD-001 | `kiw ws <sub>` dispatches to `info`, `list`/`ls`, `add`, `remove`/`rm`, `sync`, `exec`; empty arg or `help`/`-h`/`--help` prints usage with exit code Usage; an unknown sub-command reports it on stderr then prints usage with exit code Usage. | Must | Unit |
+| WS-CMD-002 | Workspace detection walks upward from the current directory: a directory containing `go.work` classifies as multi-repo with members parsed from both block-form and single-line `use` directives; a bare `go.mod` root classifies as monorepo with itself as sole member; neither yields unknown. | Must | Unit |
+| WS-CMD-003 | `ws info` prints the workspace root path, its classification, every member, and the `go.work` location when present. | Must | Unit |
+| WS-CMD-004 | `ws list` prints one PROJECT/KIND/MODULE row per member, resolving module paths via the go.mod reader and kinds via project-shape detection. | Must | Unit |
+| WS-CMD-005 | `ws add <path>` and `ws remove <path>` mutate `go.work` through `go work use` / `go work edit -dropuse` executed at the workspace root; a missing argument or a non-`go.work` layout exits Usage without invoking the toolchain. | Must | Unit |
+| WS-CMD-006 | `ws sync` runs `go work sync` at the workspace root.                                                            | Must | Unit |
+| WS-CMD-007 | `ws exec [--] <cmd> [args…]` runs the command inside every member that has a `go.mod`, streaming output live, collecting failed members, and exiting Failure when at least one member failed; a missing command exits Usage. | Must | Unit |
+| WS-CMD-008 | The help text documents all sub-commands, runnable examples, and the four workspace types (monorepo, multi-repo, multi-project, microservices). | Should | Unit |
 
 ## Non-Goals
 

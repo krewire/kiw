@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-// Spec: KWN-JB7PW RND-VS-004 Scope: Package
+// Spec: KWN-JB7PW RND-VS-004 Scope: Unit
 func TestKWN_VS_004_HumanVersion_CollapsesUnknownToDev(t *testing.T) {
 	cases := map[string]string{
 		"":              "dev",
@@ -24,7 +24,7 @@ func TestKWN_VS_004_HumanVersion_CollapsesUnknownToDev(t *testing.T) {
 	}
 }
 
-// Spec: KWN-JB7PW RND-VS-005 Scope: Package
+// Spec: KWN-JB7PW RND-VS-005 Scope: Unit
 func TestKWN_VS_005_HumanVersion_SingleLeadingV(t *testing.T) {
 	for _, in := range []string{"v0.5.1", "0.5.1", "v(devel)", "(devel)", "devel", ""} {
 		got := humanVersion(in)
@@ -37,7 +37,7 @@ func TestKWN_VS_005_HumanVersion_SingleLeadingV(t *testing.T) {
 	}
 }
 
-// Spec: KWN-JB7PW RND-VS-009 Scope: Package
+// Spec: KWN-JB7PW RND-VS-009 Scope: Unit
 func TestKWN_VS_009_QualifiedVersion_MarksWorkspaceBuilds(t *testing.T) {
 	for _, path := range []string{ModFramework, ModLibs} {
 		got := qualifiedVersion(path)
@@ -50,7 +50,7 @@ func TestKWN_VS_009_QualifiedVersion_MarksWorkspaceBuilds(t *testing.T) {
 	}
 }
 
-// Spec: KWN-JB7PW S1 Scope: Package
+// Spec: KWN-JB7PW S1 Scope: Unit
 func TestKWN_JB7PW_S1_ResolveVersions_MatchInfoPaths(t *testing.T) {
 	fw, libs := resolveVersions()
 	if fw == "" || libs == "" {

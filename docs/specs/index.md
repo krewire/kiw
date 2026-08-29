@@ -8,6 +8,7 @@ Ordered by **impact-to-effort** (high impact, low effort first) and **dependency
 | --------- | ------------------------------------------ | ------ | ---------- |
 | [KWN-Z0VFC](./KWN-DEVTOOL-Z0VFC-krewire-devtool.md)      | Krewire Devtool — Initial Specification | Draft | — |
 | [KWN-6K41E](./KWN-RUN-6K41E-krewire-run-dev-deploy.md) | krewire run/dev/deploy              | Draft | KWN-Z0VFC |
+| [KWN-SCRIPT-9F3KQ](./KWN-SCRIPT-9F3KQ-kiw-script-runner.md) | kiw Script Runner — `kiw run <task>` and `kiw run file.go` | Draft | KWN-6K41E, KWN-Q7X4M, KWN-Z0VFC |
 | [KWN-RD3WS](./KWN-SCAFFOLD-RD3WS-project-scaffolding.md) | Project Scaffolding                  | Draft | KWN-Z0VFC |
 | [KWN-7QM2X](./KWN-INIT-7QM2X-init-project-variants.md) | Init Project Variants                    | Draft | KWN-RD3WS |
 | [KWN-1QGI2](./KWN-BUILD-1QGI2-project-building.md)   | Project Building                      | Draft | KWN-Z0VFC |
@@ -17,6 +18,7 @@ Ordered by **impact-to-effort** (high impact, low effort first) and **dependency
 | [KWN-MZ4LE](./KWN-GUILD-MZ4LE-guild-install-command.md) | krewire guild install Command        | Draft | KWN-Z0VFC |
 | [KWN-Q3M8V](./KWN-WORKSPACE-Q3M8V-workspace-command.md) | Workspace Command — Multi-Repo & Monorepo Workflows | Draft | KWN-Z0VFC |
 | [KWN-Q7X4M](./KWN-CONF-Q7X4M-config-directory-and-dotenv.md) | Config Directory & Dotenv (provider → config/ → .env → krewire.yaml) | Draft | KWL-K4T7W, KWL-2X1QZ, KWN-RD3WS |
+| [KWN-PKG-7X9K2](./KWN-PKG-7X9K2-add-remove-package.md) | kiw add/remove — scalable package@version (plugin → gomod → npm) | Draft | — |
 
 ## Conventions
 
