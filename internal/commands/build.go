@@ -9,14 +9,14 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/krewire/ship/plugin"
-	_ "github.com/krewire/ship/plugin"
 	"github.com/krewire/framework/ui"
 	"github.com/krewire/framework/web/ssg"
 	"github.com/krewire/kiw/internal/config"
 	"github.com/krewire/kiw/internal/gomod"
 	"github.com/krewire/libs/core"
 	"github.com/krewire/mdbind/book"
+	"github.com/krewire/ship/plugin"
+	_ "github.com/krewire/ship/plugin"
 )
 
 // RegisterBuild registers flags for the build command.

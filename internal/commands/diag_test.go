@@ -10,7 +10,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/krewire/libs/core"
 	"github.com/krewire/libs/vein"
 )
 
