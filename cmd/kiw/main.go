@@ -15,6 +15,7 @@ func main() {
 		WithDescription("One CLI for every workload — site, book, app, worker, service, infra").
 		Command(tui.NewCommand("version", "print CLI and framework versions", nil, commands.RunVersion).WithGroup("inspect").WithExample("kiw version")).
 		Command(tui.NewCommand("info", "print environment and project information", nil, commands.RunInfo).WithGroup("inspect").WithExample("kiw info")).
+		Command(tui.NewCommand("compat", "check version compatibility across all modules", nil, commands.RunCompat).WithGroup("inspect").WithExample("kiw compat")).
 		Command(tui.NewCommand("new", "scaffold a minimal Krewire project kernel", commands.RegisterNew, commands.RunNew).WithGroup("project").WithExample("kiw new my-site")).
 		Command(tui.NewCommand("init", "equip the project with a variant: monolith, --site, --book, --cli, or --template", commands.RegisterInit, commands.RunInit).WithGroup("project").WithExample("kiw init --site")).
 		Command(tui.NewCommand("build", "build the current project's website", commands.RegisterBuild, commands.RunBuild).WithGroup("build").WithExample("kiw build")).
@@ -28,7 +29,8 @@ func main() {
 		Command(tui.NewCommand("remove", "remove a package or plugin", commands.RegisterRemove, commands.RunRemove).WithGroup("project").WithExample("kiw remove twcss")).
 		Command(tui.NewCommand("deploy", "stage deployable artifacts in dist/", commands.RegisterDeploy, commands.RunDeploy).WithGroup("ship").WithExample("kiw deploy --preview")).
 		Command(tui.NewCommand("ws", "workspace for monorepo, multi-repo, multi-project, microservices", commands.RegisterWs, commands.RunWs).WithGroup("ship").WithExample("kiw ws help")).
-		Command(tui.NewCommand("guild", "install the Guild AI agent template into a project", commands.RegisterGuild, commands.RunGuild).WithGroup("ship").WithExample("kiw guild install"))
+		Command(tui.NewCommand("guild", "install the Guild AI agent template into a project", commands.RegisterGuild, commands.RunGuild).WithGroup("ship").WithExample("kiw guild install")).
+		Command(tui.NewCommand("release", "bump versions and stage a release across modules", commands.RegisterRelease, commands.RunRelease).WithGroup("ship").WithExample("kiw release framework --bump minor --apply"))
 
 	os.Exit(int(app.Run(os.Args[1:])))
 }
