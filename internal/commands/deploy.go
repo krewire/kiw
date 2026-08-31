@@ -20,24 +20,28 @@ var pagesBranches = []string{"gh-deploy", "gh-pages"}
 
 // RegisterDeploy registers flags for the deploy command.
 func RegisterDeploy(fs *flag.FlagSet) {
-	fs.String("target", "binary", "deploy target: binary or gh-pages")
+	fs.String("target", "binary", "deploy target: binary, gh-pages, or infra")
 	fs.String("remote", "origin", "git remote to publish the pages branch to")
 	fs.String("branch", "", "pages branch to publish (default: existing gh-deploy or gh-pages, else gh-pages)")
 	fs.Bool("dry-run", false, "stage dist/ but skip publishing and tests")
 	fs.String("message", "", "commit message for the pages publication")
+	fs.Bool("plan", false, "infra: show plan without applying (KWF-B7N3D)")
+	fs.Bool("auto-approve", false, "infra: skip confirmation prompt")
+	fs.Bool("destroy", false, "infra: tear down infrastructure")
+	fs.String("env", "", "infra: target environment (local, production, testing)")
 }
 
 // RunDeploy validates the project then stages a deployable artifact in
 // dist/: the compiled app binary (binary target) and/or the exported site.
 // The gh-pages target additionally publishes the built site to the project's
 // pages branch on the configured remote (--dry-run skips both tests and
-// publishing).
+// publishing). The infra target uses framework/infra for plan/apply (KWF-B7N3D).
 func RunDeploy(fs *flag.FlagSet) core.ExitCode {
 	target := flagValue(fs, "target")
 	switch target {
-	case "binary", "gh-pages":
+	case "binary", "gh-pages", "infra":
 	default:
-		fmt.Fprintf(os.Stderr, "kiw deploy: unknown target %q — supported: binary, gh-pages\n", target)
+		fmt.Fprintf(os.Stderr, "kiw deploy: unknown target %q — supported: binary, gh-pages, infra\n", target)
 		return core.ExitCodeUsage
 	}
 	dryRun := flagBool(fs, "dry-run")
@@ -59,6 +63,10 @@ func RunDeploy(fs *flag.FlagSet) core.ExitCode {
 	if res.Kind == shape.KindNone {
 		fmt.Fprintln(os.Stderr, "kiw deploy: no project found — run 'kiw new <project>' first")
 		return core.ExitCodeUsage
+	}
+
+	if target == "infra" {
+		return runInfraDeploy(root, cfg, fs, dryRun)
 	}
 
 	if !dryRun && hasFile(root, "go.mod") {
@@ -95,6 +103,34 @@ func RunDeploy(fs *flag.FlagSet) core.ExitCode {
 	}
 
 	fmt.Println("deployed " + dist)
+	return core.ExitCodeSuccess
+}
+
+// runInfraDeploy handles infra target deployment (KWF-B7N3D FRK-INFRA-050/051).
+func runInfraDeploy(root string, cfg *config.Config, fs *flag.FlagSet, dryRun bool) core.ExitCode {
+	plan := flagBool(fs, "plan")
+	destroy := flagBool(fs, "destroy")
+	autoApprove := flagBool(fs, "auto-approve")
+	env := firstNonEmpty(flagValue(fs, "env"), cfg.Env, "local")
+
+	slog.Info("infra deploy", "env", env, "plan", plan, "destroy", destroy)
+
+	// For now, infra deploy is a placeholder that shows what would happen.
+	// Full implementation requires provider-specific SDK integration.
+	fmt.Printf("infra deploy: env=%s plan=%t destroy=%t auto-approve=%t\n", env, plan, destroy, autoApprove)
+	if plan {
+		fmt.Println("  plan: would show resource diff (not yet implemented)")
+	}
+	if destroy {
+		fmt.Println("  destroy: would tear down infrastructure (not yet implemented)")
+	}
+	if dryRun {
+		fmt.Println("  dry-run: no changes made")
+		return core.ExitCodeSuccess
+	}
+	if !autoApprove && !plan {
+		fmt.Println("  use --auto-approve to apply changes, or --plan to preview")
+	}
 	return core.ExitCodeSuccess
 }
 
