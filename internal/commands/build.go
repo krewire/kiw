@@ -9,6 +9,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/krewire/framework/runtime/build"
 	"github.com/krewire/framework/ui"
 	"github.com/krewire/framework/web/ssg"
 	"github.com/krewire/kiw/internal/config"
@@ -30,6 +31,7 @@ func RegisterBuild(fs *flag.FlagSet) {
 	fs.String("title", "", "site title (defaults to the project name)")
 	fs.String("author", "", "site author")
 	fs.String("theme", "", "theme mode: auto, light, dark, or off (default auto)")
+	fs.String("target", "ssg", "build target: ssg, book, or wasm (default ssg)")
 }
 
 // RunBuild builds the current project's website. It supports both declarative
@@ -81,6 +83,12 @@ func RunBuild(fs *flag.FlagSet) core.ExitCode {
 		} else {
 			built = true
 		}
+	}
+	if flagValue(fs, "target") == "wasm" {
+		if code := buildWASM(root, cfg, fs); code != core.ExitCodeSuccess {
+			return code
+		}
+		built = true
 	}
 	if built {
 		writeManifest(outDir, collectCreated(outDir))
@@ -263,6 +271,27 @@ func buildManuscript(root string, cfg *config.Config, fs *flag.FlagSet, hybrid b
 	for _, path := range created {
 		fmt.Println("created " + path)
 	}
+	return core.ExitCodeSuccess
+}
+
+// buildWASM compiles the project's WASM entry point (KWF-T4X9P FRK-WASM-002).
+func buildWASM(root string, cfg *config.Config, fs *flag.FlagSet) core.ExitCode {
+	entry := firstNonEmpty(cfg.Wasm.Entry, "./wasm")
+	outDir := joinRoot(root, firstNonEmpty(flagValue(fs, "output"), flagValue(fs, "o"), cfg.Output), config.DefaultOutput)
+	name := firstNonEmpty(cfg.Wasm.Name, "runtime")
+
+	slog.Info("building WASM module", "entry", entry, "output", outDir)
+	artifacts, err := build.BuildWASM(build.Config{
+		Entry:  entry,
+		OutDir: outDir,
+		Name:   name,
+	})
+	if err != nil {
+		return fail(err)
+	}
+	fp := build.Fingerprint(artifacts.Digest)
+	slog.Info("WASM build complete", "wasm", filepath.Base(artifacts.WASM), "js", filepath.Base(artifacts.JS), "fingerprint", fp)
+	fmt.Printf("created %s (fingerprint: %s)\n", artifacts.WASM, fp)
 	return core.ExitCodeSuccess
 }
 

@@ -63,6 +63,8 @@ type Config struct {
 	// the web/ssg generator instead of mdbind. Top-level fields (Title,
 	// Author, Base, Output, Theme) are injected into the SSG config.
 	SSG *SSGConfig `yaml:"ssg"`
+	// Wasm holds WASM build configuration (KWF-T4X9P).
+	Wasm WasmConfig `yaml:"wasm"`
 	// Scripts holds named shell commands runnable via `kiw run <task>`.
 	// Keys are task names, values are shell commands executed with `sh -c`
 	// (Unix) or `cmd /C` (Windows). Optional, zero-value nil means no tasks.
@@ -91,6 +93,14 @@ type BookConfig struct {
 	// project it defaults to false (suppressed so the ssg landing page owns
 	// "/"); set `toc: true` to force it on. Standalone books always emit it.
 	TOC *bool `yaml:"toc"`
+}
+
+// WasmConfig holds WASM build configuration under the `wasm:` key (KWF-T4X9P).
+type WasmConfig struct {
+	// Entry is the main package path to build (default "./wasm").
+	Entry string `yaml:"entry"`
+	// Name is the output module name (default "runtime").
+	Name string `yaml:"name"`
 }
 
 // IsSSG reports whether this config targets the declarative SSG mode.
