@@ -69,4 +69,3 @@ func TestRunReleaseProjectMissingConfigFails(t *testing.T) {
 		t.Error("expected failure when no Krewire project is present")
 	}
 }
-
