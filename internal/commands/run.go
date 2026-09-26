@@ -18,9 +18,11 @@ import (
 	"github.com/krewire/libs/core"
 )
 
+const defaultAddr = ":8080"
+
 // RegisterRun registers flags for the run command.
 func RegisterRun(fs *flag.FlagSet) {
-	fs.String("addr", "", "listen address for the app (default :8080)")
+	fs.String("addr", "", "listen address for the app (default "+defaultAddr+")")
 	registerRuntimeFlags(fs)
 }
 
@@ -106,7 +108,7 @@ func runApp(rt *runtimeEnv, fs *flag.FlagSet) core.ExitCode {
 	defer os.RemoveAll(dir)
 
 	bin := filepath.Join(dir, "app")
-	addr := firstNonEmpty(flagValue(fs, "addr"), ":8080")
+	addr := firstNonEmpty(flagValue(fs, "addr"), defaultAddr)
 
 	slog.Info("building app", "bin", bin)
 	build := exec.Command("go", "build", "-o", bin, ".")

@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	modFramework = "github.com/krewire/framework"
-	modLibs      = "github.com/krewire/libs"
+	ModFramework = "github.com/krewire/framework"
+	ModLibs      = "github.com/krewire/libs"
 )
 
 // DevelVersion is the version Go records for modules built from source
@@ -39,9 +39,9 @@ func ModuleVersion(path string) string {
 // module at path, or "" for unknown paths.
 func KnownVersion(path string) string {
 	switch path {
-	case modFramework:
+	case ModFramework:
 		return framework.Version.String()
-	case modLibs:
+	case ModLibs:
 		return core.CurrentVersion.String()
 	}
 	return ""

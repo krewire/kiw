@@ -4,6 +4,8 @@ package commands
 import (
 	"strings"
 	"testing"
+
+	"github.com/krewire/kiw/internal/buildinfo"
 )
 
 // Spec: KWN-JB7PW RND-VS-004 Scope: Unit
@@ -39,7 +41,7 @@ func TestKWN_VS_005_HumanVersion_SingleLeadingV(t *testing.T) {
 
 // Spec: KWN-JB7PW RND-VS-009 Scope: Unit
 func TestKWN_VS_009_QualifiedVersion_MarksWorkspaceBuilds(t *testing.T) {
-	for _, path := range []string{ModFramework, ModLibs} {
+	for _, path := range []string{buildinfo.ModFramework, buildinfo.ModLibs} {
 		got := qualifiedVersion(path)
 		if strings.Contains(got, "devel") {
 			t.Errorf("qualifiedVersion(%q) = %q, must never print devel", path, got)
@@ -56,8 +58,8 @@ func TestKWN_JB7PW_S1_ResolveVersions_MatchInfoPaths(t *testing.T) {
 	if fw == "" || libs == "" {
 		t.Fatalf("resolveVersions = (%q, %q), want usable versions", fw, libs)
 	}
-	if fw != moduleVersion(ModFramework) || libs != moduleVersion(ModLibs) {
+	if fw != moduleVersion(buildinfo.ModFramework) || libs != moduleVersion(buildinfo.ModLibs) {
 		t.Errorf("resolveVersions (%q, %q) disagrees with moduleVersion paths (%q, %q)",
-			fw, libs, moduleVersion(ModFramework), moduleVersion(ModLibs))
+			fw, libs, moduleVersion(buildinfo.ModFramework), moduleVersion(buildinfo.ModLibs))
 	}
 }

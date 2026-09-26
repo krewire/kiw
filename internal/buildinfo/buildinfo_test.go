@@ -5,7 +5,7 @@ import "testing"
 
 // Spec: KWN-JB7PW RND-VS-004 RND-VS-008 Scope: Unit
 func TestKWN_VS_004_ResolveVersion_WorkspaceDevelFallsBackToKnown(t *testing.T) {
-	for _, path := range []string{modFramework, modLibs} {
+	for _, path := range []string{ModFramework, ModLibs} {
 		got, fromSource := ResolveVersion(path)
 		if got == "" || got == DevelVersion {
 			t.Errorf("ResolveVersion(%q) = %q, want a concrete version for workspace builds", path, got)

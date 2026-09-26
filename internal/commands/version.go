@@ -13,11 +13,6 @@ import (
 	"github.com/krewire/libs/term"
 )
 
-const (
-	ModFramework = "github.com/krewire/framework"
-	ModLibs      = "github.com/krewire/libs"
-)
-
 func RunVersion(_ *flag.FlagSet) core.ExitCode {
 	tm := term.NewTerminal()
 	bold := func(s string) string { return tm.Paint(s, term.ColorCyan, []term.Style{term.StyleBold}) }
@@ -27,18 +22,18 @@ func RunVersion(_ *flag.FlagSet) core.ExitCode {
 
 	fmt.Printf("%s %s\n", bold("kiw"), dim("Krewire Devtool"))
 	fmt.Printf("  %-12s %s\n", dim("CLI"), green("v"+version.Version.String()))
-	fw := qualifiedVersion(ModFramework)
+	fw := qualifiedVersion(buildinfo.ModFramework)
 	fwColor := green(fw)
 	if strings.Contains(fw, "dev") {
 		fwColor = yellow(fw)
 	}
 	fmt.Printf("  %-12s %s %s\n", dim("Framework"), green("Krewire Framework"), fwColor)
-	lb := qualifiedVersion(ModLibs)
+	lb := qualifiedVersion(buildinfo.ModLibs)
 	lbColor := green(lb)
 	if strings.Contains(lb, "dev") {
 		lbColor = yellow(lb)
 	}
-	fmt.Printf("  %-12s %s %s\n", dim("Libraries"), green(ModLibs), lbColor)
+	fmt.Printf("  %-12s %s %s\n", dim("Libraries"), green(buildinfo.ModLibs), lbColor)
 	fmt.Printf("  %-12s %s\n", dim("Go"), dim(runtime.Version()+" ("+runtime.GOOS+"/"+runtime.GOARCH+")"))
 	return core.ExitCodeSuccess
 }
@@ -70,7 +65,7 @@ func qualifiedVersion(path string) string {
 }
 
 func resolveVersions() (framework, libs string) {
-	fw, _ := buildinfo.ResolveVersion(ModFramework)
-	lb, _ := buildinfo.ResolveVersion(ModLibs)
+	fw, _ := buildinfo.ResolveVersion(buildinfo.ModFramework)
+	lb, _ := buildinfo.ResolveVersion(buildinfo.ModLibs)
 	return fw, lb
 }

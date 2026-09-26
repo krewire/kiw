@@ -10,11 +10,6 @@ import (
 	"strings"
 )
 
-const (
-	modFramework = "github.com/krewire/framework"
-	modLibs      = "github.com/krewire/libs"
-)
-
 // Sentinels returned by the scaffold functions.
 var (
 	// ErrInvalidName is returned when the project name contains invalid

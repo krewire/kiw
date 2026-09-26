@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/krewire/kiw/internal/buildinfo"
 )
 
 func detectLocalPaths(startDir string) (string, string) {
@@ -34,12 +36,12 @@ func detectLocalPaths(startDir string) (string, string) {
 
 func goModTemplate(module, frameworkVersion, libsVersion, frameworkPath, libsPath string) string {
 	mod := fmt.Sprintf("module %s\n\ngo 1.22\n\nrequire (\n\t%s %s\n\t%s %s\n)",
-		module, modFramework, pinnedVersion(frameworkVersion), modLibs, pinnedVersion(libsVersion))
+		module, buildinfo.ModFramework, pinnedVersion(frameworkVersion), buildinfo.ModLibs, pinnedVersion(libsVersion))
 	if frameworkPath != "" {
-		mod += fmt.Sprintf("\n\nreplace %s => %s", modFramework, frameworkPath)
+		mod += fmt.Sprintf("\n\nreplace %s => %s", buildinfo.ModFramework, frameworkPath)
 	}
 	if libsPath != "" {
-		mod += fmt.Sprintf("\nreplace %s => %s", modLibs, libsPath)
+		mod += fmt.Sprintf("\nreplace %s => %s", buildinfo.ModLibs, libsPath)
 	}
 	return mod + "\n"
 }

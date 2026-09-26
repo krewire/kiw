@@ -8,6 +8,7 @@ import (
 	"runtime"
 	"sort"
 
+	"github.com/krewire/kiw/internal/buildinfo"
 	"github.com/krewire/kiw/internal/config"
 	"github.com/krewire/kiw/internal/gomod"
 	"github.com/krewire/kiw/internal/shape"
@@ -39,8 +40,8 @@ func RunInfo(_ *flag.FlagSet) core.ExitCode {
 
 	fmt.Println(boldDim("─ Environment ─────────────────────────────────"))
 	printKV(tm, "CLI", cyan("Krewire v"+version.Version.String()), dim)
-	printKV(tm, "Framework", cyan("Krewire Framework "+qualifiedVersion(ModFramework)), dim)
-	printKV(tm, "Libraries", cyan(ModLibs+" "+qualifiedVersion(ModLibs)), dim)
+	printKV(tm, "Framework", cyan("Krewire Framework "+qualifiedVersion(buildinfo.ModFramework)), dim)
+	printKV(tm, "Libraries", cyan(buildinfo.ModLibs+" "+qualifiedVersion(buildinfo.ModLibs)), dim)
 	printKV(tm, "Go", dim(runtime.Version()+" ")+yellow("("+runtime.GOOS+"/"+runtime.GOARCH+")"), dim)
 	printKV(tm, "Env", green(resolvedEnvLabel(cfg)), dim)
 	printKV(tm, "Debug", dim(fmt.Sprintf("%t", cfg.ResolveDebug("", false))), dim)
