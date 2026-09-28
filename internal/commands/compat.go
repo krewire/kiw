@@ -4,8 +4,8 @@ import (
 	"flag"
 	"fmt"
 
+	"github.com/krewire/boost"
 	"github.com/krewire/framework"
-	"github.com/krewire/guild"
 	hub "github.com/krewire/hub"
 	"github.com/krewire/kiw/internal/version"
 	"github.com/krewire/libs/core"
@@ -26,7 +26,7 @@ func RunCompat(_ *flag.FlagSet) core.ExitCode {
 		core.ModuleLibs:      core.CurrentVersion,
 		core.ModuleKiw:       version.Version,
 		core.ModuleMdbind:    mdbind.Version,
-		core.ModuleGuild:     guild.Version,
+		core.ModuleBoost:     boost.Version,
 		core.ModuleShip:      ship.Version,
 		core.ModuleHub:       hub.Version,
 	}
@@ -36,7 +36,7 @@ func RunCompat(_ *flag.FlagSet) core.ExitCode {
 		core.ModuleFramework: framework.EcosystemRequires,
 		core.ModuleKiw:       version.EcosystemRequires,
 		core.ModuleMdbind:    mdbind.EcosystemRequires,
-		core.ModuleGuild:     guild.EcosystemRequires,
+		core.ModuleBoost:     boost.EcosystemRequires,
 		core.ModuleShip:      ship.EcosystemRequires,
 		core.ModuleHub:       hub.EcosystemRequires,
 	}

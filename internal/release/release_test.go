@@ -77,7 +77,7 @@ func TestApplyWritesAndValidates(t *testing.T) {
 	if err := os.WriteFile(p, []byte(orig), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	edits := []Edit{{Module: core.ModuleGuild, File: "v.go", From: `var Version = core.MustParseVersion("0.1.0")`, To: `var Version = core.MustParseVersion("0.2.0")`}}
+	edits := []Edit{{Module: core.ModuleBoost, File: "v.go", From: `var Version = core.MustParseVersion("0.1.0")`, To: `var Version = core.MustParseVersion("0.2.0")`}}
 
 	if _, err := Apply(edits, dir, true); err != nil {
 		t.Fatalf("dry-run apply error: %v", err)
@@ -98,7 +98,7 @@ func TestApplyRejectsAmbiguousMatch(t *testing.T) {
 	p := filepath.Join(dir, "v.go")
 	_ = os.WriteFile(p, []byte(`x: core.MustParseVersion("0.1.0")
 y: core.MustParseVersion("0.1.0")`), 0o644)
-	edits := []Edit{{Module: core.ModuleGuild, File: "v.go", From: `core.MustParseVersion("0.1.0")`, To: `core.MustParseVersion("0.2.0")`}}
+	edits := []Edit{{Module: core.ModuleBoost, File: "v.go", From: `core.MustParseVersion("0.1.0")`, To: `core.MustParseVersion("0.2.0")`}}
 	if _, err := Apply(edits, dir, false); err == nil {
 		t.Error("expected ambiguous-match error")
 	}

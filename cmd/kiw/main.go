@@ -31,7 +31,8 @@ func main() {
 		Command(tui.NewCommand("worker", "run background workers / job queues", commands.RegisterWorker, commands.RunWorker).WithGroup("develop").WithExample("kiw worker")).
 		Command(tui.NewCommand("dashboard", "local dev dashboard (services, logs, traces)", commands.RegisterDashboard, commands.RunDashboard).WithGroup("develop").WithExample("kiw dashboard")).
 		Command(tui.NewCommand("ws", "workspace for monorepo, multi-repo, multi-project, microservices", commands.RegisterWs, commands.RunWs).WithGroup("ship").WithExample("kiw ws help")).
-		Command(tui.NewCommand("guild", "install the Guild AI agent template into a project", commands.RegisterGuild, commands.RunGuild).WithGroup("ship").WithExample("kiw guild install")).
+		Command(tui.NewCommand("boost", "install the Boost AI agent template into a project", commands.RegisterBoost, commands.RunBoost).WithGroup("ship").WithExample("kiw boost install")).
+		Command(tui.NewCommand("guild", "alias for kiw boost", commands.RegisterGuild, commands.RunGuild).WithGroup("ship").WithExample("kiw guild install")).
 		Command(tui.NewCommand("release", "bump versions and stage a release across modules", commands.RegisterRelease, commands.RunRelease).WithGroup("ship").WithExample("kiw release framework --bump minor --apply")).
 		Command(tui.NewCommand("generate", "generate code (handlers, migrations, specs)", commands.RegisterGenerate, commands.RunGenerate).WithGroup("project").WithExample("kiw generate --kind handler --name CreateUser"))
 

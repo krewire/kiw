@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/krewire/framework v0.3.1
-	github.com/krewire/guild v0.1.0
+	github.com/krewire/boost v0.1.0
 	github.com/krewire/libs v0.4.0
 	github.com/krewire/hub v0.0.0
 	github.com/krewire/ship v0.0.0
@@ -24,3 +24,5 @@ replace github.com/krewire/hub => ../hub
 replace github.com/krewire/ship => ../ship
 
 replace github.com/krewire/libs => ../libs
+
+replace github.com/krewire/boost => ../boost

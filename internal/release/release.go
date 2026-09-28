@@ -16,8 +16,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/krewire/boost"
 	"github.com/krewire/framework"
-	"github.com/krewire/guild"
 	hub "github.com/krewire/hub"
 	"github.com/krewire/kiw/internal/version"
 	"github.com/krewire/libs/core"
@@ -38,7 +38,7 @@ var Modules = []Manifest{
 	{Name: core.ModuleLibs, Dir: "libs", VersionFile: "libs/core/version.go"},
 	{Name: core.ModuleFramework, Dir: "framework", VersionFile: "framework/version.go"},
 	{Name: core.ModuleMdbind, Dir: "mdbind", VersionFile: "mdbind/version.go"},
-	{Name: core.ModuleGuild, Dir: "guild", VersionFile: "guild/version.go"},
+	{Name: core.ModuleBoost, Dir: "boost", VersionFile: "boost/version.go"},
 	{Name: core.ModuleShip, Dir: "ship", VersionFile: "ship/version.go"},
 	{Name: core.ModuleHub, Dir: "hub", VersionFile: "hub/version.go"},
 	{Name: core.ModuleKiw, Dir: "kiw", VersionFile: "kiw/internal/version/version.go"},
@@ -46,10 +46,10 @@ var Modules = []Manifest{
 
 // dependents maps each module to the modules that require it (reverse of go.mod).
 var dependents = map[core.ModuleName][]core.ModuleName{
-	core.ModuleLibs:      {core.ModuleFramework, core.ModuleMdbind, core.ModuleGuild, core.ModuleShip, core.ModuleHub, core.ModuleKiw},
+	core.ModuleLibs:      {core.ModuleFramework, core.ModuleMdbind, core.ModuleBoost, core.ModuleShip, core.ModuleHub, core.ModuleKiw},
 	core.ModuleFramework: {core.ModuleKiw},
 	core.ModuleMdbind:    {core.ModuleKiw},
-	core.ModuleGuild:     {core.ModuleKiw},
+	core.ModuleBoost:     {core.ModuleKiw},
 	core.ModuleShip:      {core.ModuleKiw},
 	core.ModuleHub:       {core.ModuleKiw},
 	core.ModuleKiw:       {},
@@ -77,8 +77,8 @@ func ident(name core.ModuleName) string {
 		return "core.ModuleMdbind"
 	case core.ModuleKiw:
 		return "core.ModuleKiw"
-	case core.ModuleGuild:
-		return "core.ModuleGuild"
+	case core.ModuleBoost:
+		return "core.ModuleBoost"
 	case core.ModuleShip:
 		return "core.ModuleShip"
 	case core.ModuleHub:
@@ -97,8 +97,8 @@ func CurrentVersion(name core.ModuleName) (core.Version, error) {
 		return framework.Version, nil
 	case core.ModuleMdbind:
 		return mdbind.Version, nil
-	case core.ModuleGuild:
-		return guild.Version, nil
+	case core.ModuleBoost:
+		return boost.Version, nil
 	case core.ModuleShip:
 		return ship.Version, nil
 	case core.ModuleHub:
@@ -122,8 +122,8 @@ func RequiredVersion(dependent, name core.ModuleName) (core.Version, bool) {
 	case core.ModuleMdbind:
 		v, ok := mdbind.EcosystemRequires[name]
 		return v, ok
-	case core.ModuleGuild:
-		v, ok := guild.EcosystemRequires[name]
+	case core.ModuleBoost:
+		v, ok := boost.EcosystemRequires[name]
 		return v, ok
 	case core.ModuleShip:
 		v, ok := ship.EcosystemRequires[name]

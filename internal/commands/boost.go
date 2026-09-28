@@ -11,34 +11,44 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/krewire/guild"
+	"github.com/krewire/boost"
 	"github.com/krewire/libs/core"
 )
 
-// RegisterGuild registers flags for the guild command group.
-func RegisterGuild(fs *flag.FlagSet) {
+// RegisterBoost registers flags for the boost command group.
+func RegisterBoost(fs *flag.FlagSet) {
 	fs.Bool("force", false, "overwrite existing managed files without prompting")
 	fs.Bool("dry-run", false, "report the files that would be written without writing")
 }
 
-// RunGuild dispatches the guild sub-commands. Currently only "install" is
+// RegisterGuild is a backwards-compatible alias for RegisterBoost.
+func RegisterGuild(fs *flag.FlagSet) {
+	RegisterBoost(fs)
+}
+
+// RunBoost dispatches the boost sub-commands. Currently only "install" is
 // implemented; with no sub-command the wizard starts interactively.
-func RunGuild(fs *flag.FlagSet) core.ExitCode {
+func RunBoost(fs *flag.FlagSet) core.ExitCode {
 	sub := fs.Arg(0)
 	switch sub {
 	case "install":
-		return runGuildInstall(fs, os.Stdin, os.Stdout)
+		return runBoostInstall(fs, os.Stdin, os.Stdout)
 	case "":
-		return usageMessage("usage: kiw guild install [target] [--force] [--dry-run]")
+		return usageMessage("usage: kiw boost install [target] [--force] [--dry-run]")
 	default:
-		return usageMessage(fmt.Sprintf("unknown guild sub-command %q (supported: install)", sub))
+		return usageMessage(fmt.Sprintf("unknown boost sub-command %q (supported: install)", sub))
 	}
 }
 
-// runGuildInstall installs the Guild template into a target directory. When
+// RunGuild is a backwards-compatible alias for RunBoost.
+func RunGuild(fs *flag.FlagSet) core.ExitCode {
+	return RunBoost(fs)
+}
+
+// runBoostInstall installs the Boost template into a target directory. When
 // the target is not supplied it is asked for interactively; existing managed
 // files prompt for confirmation unless --force is given.
-func runGuildInstall(fs *flag.FlagSet, in io.Reader, out io.Writer) core.ExitCode {
+func runBoostInstall(fs *flag.FlagSet, in io.Reader, out io.Writer) core.ExitCode {
 	target := fs.Arg(1)
 	if target == "" {
 		line, err := promptLine(in, out, "Target directory (enter `.` for current): ")
@@ -85,28 +95,28 @@ func runGuildInstall(fs *flag.FlagSet, in io.Reader, out io.Writer) core.ExitCod
 		}
 	}
 
-	opts := []guild.Option{}
+	opts := []boost.Option{}
 	if force {
-		opts = append(opts, guild.WithForce())
+		opts = append(opts, boost.WithForce())
 	}
 	if dryRun {
-		opts = append(opts, guild.WithDryRun())
+		opts = append(opts, boost.WithDryRun())
 	}
 
 	target, err := absPath(target)
 	if err != nil {
 		return fail(err)
 	}
-	created, err := guild.Install(target, opts...)
+	created, err := boost.Install(target, opts...)
 	if err != nil {
-		return guildInstallError(err)
+		return boostInstallError(err)
 	}
 
 	if dryRun {
-		fmt.Fprintln(out, "Dry run — would install Guild into "+target)
+		fmt.Fprintln(out, "Dry run — would install Boost into "+target)
 	} else {
-		slog.Info("installed guild template", "dir", target, "files", len(created))
-		fmt.Fprintln(out, "Installed Guild into "+target)
+		slog.Info("installed boost template", "dir", target, "files", len(created))
+		fmt.Fprintln(out, "Installed Boost into "+target)
 	}
 	for _, path := range created {
 		fmt.Fprintln(out, "created "+path)
@@ -128,15 +138,14 @@ func absPath(target string) (string, error) {
 	return filepath.Abs(target)
 }
 
-// detectManagedConflicts reports managed guild paths that already exist under
+// detectManagedConflicts reports managed boost paths that already exist under
 // target, mirroring the library's conflict detection for prompting.
 func detectManagedConflicts(target string) ([]string, error) {
 	var conflicts []string
-	for _, rel := range guild.Managed() {
+	for _, rel := range boost.Managed() {
 		p := filepath.Join(target, rel)
 		if _, err := os.Lstat(p); err == nil {
 			conflicts = append(conflicts, p)
-			continue
 		} else if !errors.Is(err, os.ErrNotExist) {
 			return nil, err
 		}
@@ -144,11 +153,11 @@ func detectManagedConflicts(target string) ([]string, error) {
 	return conflicts, nil
 }
 
-// guildInstallError maps the library's sentinel errors onto exit codes.
-func guildInstallError(err error) core.ExitCode {
+// boostInstallError maps the library's sentinel errors onto exit codes.
+func boostInstallError(err error) core.ExitCode {
 	fmt.Fprintln(os.Stderr, "kiw:", err)
 	switch {
-	case errors.Is(err, guild.ErrTargetMissing), errors.Is(err, guild.ErrConflicts):
+	case errors.Is(err, boost.ErrTargetMissing), errors.Is(err, boost.ErrConflicts):
 		return core.ExitCodeUsage
 	default:
 		return core.ExitCodeFailure
