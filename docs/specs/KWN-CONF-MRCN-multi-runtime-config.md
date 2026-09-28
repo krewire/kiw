@@ -36,7 +36,7 @@ These files coexist in the same directory but are loaded by different tools (`ki
 
 ### 1.2 Existing Krewire Config
 
-Krewire's configuration is defined in `krewire.yaml` with typed structs loaded via `libs/config` and validated via `libs/validate`. The `libs/core` package validates `Kind`, `Workload`, and `SpecID`. This spec extends the config model to support multi-runtime awareness without modifying the core config struct.
+Krewire's configuration is defined in `krewire.yaml` with typed structs loaded via `libs/config` and validated via `libs/validation`. The `libs/core` package validates `Kind`, `Workload`, and `SpecID`. This spec extends the config model to support multi-runtime awareness without modifying the core config struct.
 
 ### 1.3 The `.env` Bridge
 
@@ -128,7 +128,7 @@ Environment variables defined in `.env` must be accessible to Go processes spawn
 | ID        | Requirement                                                                                      | Priority |
 | --------- | ------------------------------------------------------------------------------------------------ | -------- |
 | FRK-CONF-040 | `kiw vet` checks that all environment variables referenced in `krewire.yaml` exist in `.env` (or have defaults). | Should |
-| FRK-CONF-041 | `krewire.yaml` validation (`libs/validate`) checks that `runtime.namespace` and `runtime.env_file` fields are valid if present. | Should |
+| FRK-CONF-041 | `krewire.yaml` validation (`libs/validation`) checks that `runtime.namespace` and `runtime.env_file` fields are valid if present. | Should |
 
 ---
 

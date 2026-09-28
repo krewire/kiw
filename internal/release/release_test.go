@@ -26,9 +26,9 @@ func TestPlanReleasingLibsPropagatesToAllDependents(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// own bump + framework, mdbind, guild, ship, kiw = 6 edits
-	if len(edits) != 6 {
-		t.Fatalf("got %d edits, want 6: %+v", len(edits), edits)
+	// own bump + framework, mdbind, guild, ship, hub, kiw = 7 edits
+	if len(edits) != 7 {
+		t.Fatalf("got %d edits, want 7: %+v", len(edits), edits)
 	}
 	nv := Bump(mustCur(core.ModuleLibs), BumpPatch)
 	for _, e := range edits {
@@ -64,9 +64,9 @@ func TestPlanAllModules(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// 6 own bumps + 9 dependent edges (libs:5, framework:1, mdbind:1, guild:1, ship:1) = 15
-	if len(edits) != 15 {
-		t.Fatalf("got %d edits, want 15: %+v", len(edits), edits)
+	// 7 own bumps + 10 dependent edges (libs:6, framework:1, mdbind:1, guild:1, ship:1) = 17
+	if len(edits) != 17 {
+		t.Fatalf("got %d edits, want 17: %+v", len(edits), edits)
 	}
 }
 

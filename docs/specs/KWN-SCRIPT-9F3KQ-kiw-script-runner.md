@@ -75,7 +75,7 @@ Both are **devtool concerns**, not new workloads — they enrich `cli`/`kernel` 
 | KWN-SCR-002 | `kiw run <task>` where `<task>` matches a key in `krewire.yaml` `scripts` map and is not a `.go` file **MUST** execute the command string via `sh -c` (Unix) or `cmd /C` (Windows), streaming stdio, forwarding SIGINT/SIGTERM, and returning the child's exit code; unknown task **MUST** exit `core.ExitCodeUsage` with `Available tasks: ...` hint. | Module | Must | MUST |
 | KWN-SCR-003 | Bare `kiw run` (no args) **MUST** preserve existing `app`/`cli` behavior (`go build -o /tmp ... .` then exec) per `KWN-RUN-6K41E:RND-RUN-001`; `site`/`book` kinds **MUST** still be rejected with `build + serve` guidance. | Module | Must | MUST |
 | KWN-SCR-004 | Precedence **MUST** be: file exists (`.go`) > scripts key > project run; ambiguity (`seed.go` file and `scripts.seed` both exist) **MUST** prefer file and emit a warning to stderr `warning: both file and task "seed" exist; running file`. | Module | Must | MUST |
-| KWN-SCR-005 | `krewire.yaml` **MUST** support top-level `scripts: map[string]string` (optional, zero-value nil) validated by `libs/validate` (no `validate:"required"`); missing map **MUST** be treated as empty. | Module | Must | MUST |
+| KWN-SCR-005 | `krewire.yaml` **MUST** support top-level `scripts: map[string]string` (optional, zero-value nil) validated by `libs/validation` (no `validate:"required"`); missing map **MUST** be treated as empty. | Module | Must | MUST |
 | KWN-SCR-006 | `kiw run --help` and `kiw help run` **MUST** document file and task modes with examples. | Module | Should | SHOULD |
 | KWN-SCR-007 | `kiw info` **SHOULD** list `scripts` keys when a `krewire.yaml` with `scripts` is detected. | Module | Should | SHOULD |
 
@@ -85,7 +85,7 @@ Both are **devtool concerns**, not new workloads — they enrich `cli`/`kernel` 
 |----|----------|-------------|
 | NFR1 | Performance | File runner cold `≤ 4s`, warm (GOCACHE) `≤ 1.5s` on CI baseline; task alias overhead `≤ 50ms`. |
 | NFR2 | Quality Gates | `gofmt -l .` empty, `go vet ./...` clean, `go test ./...` passes (`KWN-RUN-6K41E:NFR5`). |
-| NFR3 | Stdlib-first | Only `os/exec`, `os/signal`, `path/filepath`, `runtime` plus `libs/core`/`libs/validate`; no third-party. |
+| NFR3 | Stdlib-first | Only `os/exec`, `os/signal`, `path/filepath`, `runtime` plus `libs/core`/`libs/validation`; no third-party. |
 | NFR4 | Portability | Linux, macOS, Windows (`sh -c` vs `cmd /C` branch, `gofmt` consistent). |
 | NFR5 | Security | `unsafe` **MUST NOT** be used; scripts assumed trusted; no shell injection beyond `sh -c` of the literal `scripts` value. |
 | NFR6 | Compatibility | Backward compat with `KWN-RUN-6K41E` and `krewire.yaml` without `scripts` (zero-cost when unused). |
@@ -100,7 +100,7 @@ Workspace (go.work hub, bin/kiw)
      ├─ kiw/internal/config/conf.go  — add Scripts map, inject into build
      ├─ kiw/internal/commands/run.go — branch: isGoFile(path) ? runGoFile : isScript(task) ? runScript : runApp/runCLI (existing)
      ├─ kiw/internal/commands/info.go — list scripts
-     └─ libs/core, libs/validate      — unchanged (core stdlib-only)
+     └─ libs/core, libs/validation      — unchanged (core stdlib-only)
 ```
 
 Dependency direction: `kiw` → `libs` (core/validate/config) — no `framework` import, preserving `AGENTS.md` layer `libs ← framework/mdbind ← kiw ← guild`.

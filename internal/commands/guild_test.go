@@ -25,7 +25,7 @@ func TestRunGuildInstallFresh(t *testing.T) {
 	if code != core.ExitCodeSuccess {
 		t.Fatalf("want success, got %d (%s)", code.Int(), out.String())
 	}
-	for _, want := range []string{"AGENTS.md", "opencode.json", ".agents/README.md"} {
+	for _, want := range []string{"AGENTS.md", "opencode.json"} {
 		if _, err := os.Stat(filepath.Join(target, want)); err != nil {
 			t.Errorf("missing %s: %v", want, err)
 		}

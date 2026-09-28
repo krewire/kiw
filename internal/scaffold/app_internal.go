@@ -89,7 +89,7 @@ func internalConfigTemplate() string {
 		"\t\"fmt\"\n" +
 		"\t\"os\"\n\n" +
 		"\trconfig \"github.com/krewire/libs/config\"\n" +
-		"\t\"github.com/krewire/libs/validate\"\n" +
+		"	validation \"github.com/krewire/libs/validation\"\n" +
 		")\n\n" +
 		"// Metadata mirrors krewire.yaml.\n" +
 		"type Metadata struct {\n" +
@@ -111,7 +111,7 @@ func internalConfigTemplate() string {
 		"\tif err := rconfig.Override(cfg, os.LookupEnv); err != nil {\n" +
 		"\t\treturn nil, err\n" +
 		"\t}\n" +
-		"\tif err := validate.Struct(cfg); err != nil {\n" +
+		"\tif err := validation.Struct(cfg); err != nil {\n" +
 		"\t\treturn nil, fmt.Errorf(\"config: %w\", err)\n" +
 		"\t}\n" +
 		"\treturn cfg, nil\n" +
@@ -127,7 +127,7 @@ func internalHttpTemplate() string {
 		"\t\"net/http\"\n\n" +
 		"\trvapp \"github.com/krewire/framework/app\"\n" +
 		"\trvweb \"github.com/krewire/framework/web\"\n" +
-		"\t\"github.com/krewire/libs/validate\"\n" +
+		"	validation \"github.com/krewire/libs/validation\"\n" +
 		")\n\n" +
 		"// Handler serves the JSON API endpoints.\n" +
 		"type Handler struct{}\n\n" +
@@ -152,7 +152,7 @@ func internalHttpTemplate() string {
 		"\t\trvweb.Error(w, err)\n" +
 		"\t\treturn\n" +
 		"\t}\n" +
-		"\tif err := validate.Struct(&req); err != nil {\n" +
+		"\tif err := validation.Struct(&req); err != nil {\n" +
 		"\t\trvweb.Error(w, &rvweb.HTTPError{Status: http.StatusBadRequest, Code: \"invalid\", Message: err.Error()})\n" +
 		"\t\treturn\n" +
 		"\t}\n" +

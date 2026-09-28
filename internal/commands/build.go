@@ -17,7 +17,6 @@ import (
 	"github.com/krewire/libs/core"
 	"github.com/krewire/mdbind/book"
 	"github.com/krewire/hub/plugin"
-	_ "github.com/krewire/hub/plugin"
 )
 
 // RegisterBuild registers flags for the build command.

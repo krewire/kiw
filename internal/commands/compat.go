@@ -6,6 +6,7 @@ import (
 
 	"github.com/krewire/framework"
 	"github.com/krewire/guild"
+	hub "github.com/krewire/hub"
 	"github.com/krewire/kiw/internal/version"
 	"github.com/krewire/libs/core"
 	"github.com/krewire/mdbind"
@@ -27,6 +28,7 @@ func RunCompat(_ *flag.FlagSet) core.ExitCode {
 		core.ModuleMdbind:    mdbind.Version,
 		core.ModuleGuild:     guild.Version,
 		core.ModuleShip:      ship.Version,
+		core.ModuleHub:       hub.Version,
 	}
 
 	// Requirements: each module's declared EcosystemRequires.
@@ -36,6 +38,7 @@ func RunCompat(_ *flag.FlagSet) core.ExitCode {
 		core.ModuleMdbind:    mdbind.EcosystemRequires,
 		core.ModuleGuild:     guild.EcosystemRequires,
 		core.ModuleShip:      ship.EcosystemRequires,
+		core.ModuleHub:       hub.EcosystemRequires,
 	}
 
 	issues := core.CheckCompatibility(actual, reqs)

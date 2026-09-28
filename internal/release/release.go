@@ -18,6 +18,7 @@ import (
 
 	"github.com/krewire/framework"
 	"github.com/krewire/guild"
+	hub "github.com/krewire/hub"
 	"github.com/krewire/kiw/internal/version"
 	"github.com/krewire/libs/core"
 	"github.com/krewire/mdbind"
@@ -39,16 +40,18 @@ var Modules = []Manifest{
 	{Name: core.ModuleMdbind, Dir: "mdbind", VersionFile: "mdbind/version.go"},
 	{Name: core.ModuleGuild, Dir: "guild", VersionFile: "guild/version.go"},
 	{Name: core.ModuleShip, Dir: "ship", VersionFile: "ship/version.go"},
+	{Name: core.ModuleHub, Dir: "hub", VersionFile: "hub/version.go"},
 	{Name: core.ModuleKiw, Dir: "kiw", VersionFile: "kiw/internal/version/version.go"},
 }
 
 // dependents maps each module to the modules that require it (reverse of go.mod).
 var dependents = map[core.ModuleName][]core.ModuleName{
-	core.ModuleLibs:      {core.ModuleFramework, core.ModuleMdbind, core.ModuleGuild, core.ModuleShip, core.ModuleKiw},
+	core.ModuleLibs:      {core.ModuleFramework, core.ModuleMdbind, core.ModuleGuild, core.ModuleShip, core.ModuleHub, core.ModuleKiw},
 	core.ModuleFramework: {core.ModuleKiw},
 	core.ModuleMdbind:    {core.ModuleKiw},
 	core.ModuleGuild:     {core.ModuleKiw},
 	core.ModuleShip:      {core.ModuleKiw},
+	core.ModuleHub:       {core.ModuleKiw},
 	core.ModuleKiw:       {},
 }
 
@@ -78,6 +81,8 @@ func ident(name core.ModuleName) string {
 		return "core.ModuleGuild"
 	case core.ModuleShip:
 		return "core.ModuleShip"
+	case core.ModuleHub:
+		return "core.ModuleHub"
 	}
 	return ""
 }
@@ -96,6 +101,8 @@ func CurrentVersion(name core.ModuleName) (core.Version, error) {
 		return guild.Version, nil
 	case core.ModuleShip:
 		return ship.Version, nil
+	case core.ModuleHub:
+		return hub.Version, nil
 	case core.ModuleKiw:
 		return version.Version, nil
 	default:
@@ -120,6 +127,9 @@ func RequiredVersion(dependent, name core.ModuleName) (core.Version, bool) {
 		return v, ok
 	case core.ModuleShip:
 		v, ok := ship.EcosystemRequires[name]
+		return v, ok
+	case core.ModuleHub:
+		v, ok := hub.EcosystemRequires[name]
 		return v, ok
 	case core.ModuleKiw:
 		v, ok := version.EcosystemRequires[name]

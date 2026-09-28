@@ -122,7 +122,7 @@ func cliConfigTemplate() string {
 		"\t\"fmt\"\n" +
 		"\t\"os\"\n\n" +
 		"\trconfig \"github.com/krewire/libs/config\"\n" +
-		"\t\"github.com/krewire/libs/validate\"\n" +
+		"	validation \"github.com/krewire/libs/validation\"\n" +
 		")\n\n" +
 		"// Metadata mirrors krewire.yaml.\n" +
 		"type Metadata struct {\n" +
@@ -144,7 +144,7 @@ func cliConfigTemplate() string {
 		"\tif err := rconfig.Override(cfg, os.LookupEnv); err != nil {\n" +
 		"\t\treturn nil, err\n" +
 		"\t}\n" +
-		"\tif err := validate.Struct(cfg); err != nil {\n" +
+		"\tif err := validation.Struct(cfg); err != nil {\n" +
 		"\t\treturn nil, fmt.Errorf(\"config: %w\", err)\n" +
 		"\t}\n" +
 		"\treturn cfg, nil\n" +
