@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/krewire/ship/plugin"
+	"github.com/krewire/hub/plugin"
 )
 
 // Installer is the install/uninstall contract for a resolved package.
