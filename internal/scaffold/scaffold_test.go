@@ -178,8 +178,12 @@ func TestEquipStatic(t *testing.T) {
 		t.Fatal(err)
 	}
 	assertFileContains(t, filepath.Join(dir, "krewire.yaml"), "kind: site")
-	assertFileContains(t, filepath.Join(dir, "krewire.yaml"), "ssg:")
-	assertFileContains(t, filepath.Join(dir, "krewire.yaml"), "title: My Site")
+	assertFileContains(t, filepath.Join(dir, "pages/index.kiw"), "My Site")
+	assertFileContains(t, filepath.Join(dir, "layouts/Base.kiw"), "{{.Content}}")
+	assertFileContains(t, filepath.Join(dir, "components/Hero.kiw"), "Getting Started")
+	if _, err := os.Stat(filepath.Join(dir, "public/favicon.svg")); err != nil {
+		t.Errorf("public/favicon.svg should exist: %v", err)
+	}
 	// No ssg.yaml is produced.
 	if _, err := os.Stat(filepath.Join(dir, "ssg.yaml")); !os.IsNotExist(err) {
 		t.Error("ssg.yaml should not exist")
@@ -188,8 +192,8 @@ func TestEquipStatic(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(dir, "main.go")); !os.IsNotExist(err) {
 		t.Error("kernel main.go should be removed for a static project")
 	}
-	if len(created) == 0 {
-		t.Fatal("equip static created no files")
+	if len(created) != 6 {
+		t.Fatalf("equip static created %d files, want 6: %v", len(created), created)
 	}
 }
 

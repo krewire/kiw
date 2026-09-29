@@ -80,6 +80,18 @@ func TestDetectSite(t *testing.T) {
 	}
 }
 
+func TestDetectSiteByPagesDir(t *testing.T) {
+	dir := t.TempDir()
+	writeFile(t, dir, "pages/index.kiw", "---\ntitle: Hi\n---\n<h1>Hi</h1>\n")
+	got, err := Detect(dir, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.Kind != KindSite || got.Marker != "pages/" {
+		t.Errorf("got %v (%s), want site (pages/)", got.Kind, got.Marker)
+	}
+}
+
 func TestDetectSiteByConfigButAppPrecedes(t *testing.T) {
 	dir := t.TempDir()
 	writeFile(t, dir, "krewire.yaml", "ssg:\n")

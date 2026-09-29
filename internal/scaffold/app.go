@@ -10,6 +10,7 @@ package scaffold
 import (
 	"fmt"
 	"os"
+	"os/exec"
 )
 
 // equipApp shapes the kernel into a fullstack monolith. The root main.go
@@ -50,5 +51,12 @@ func equipApp(opts EquipOptions) ([]string, error) {
 		{"README.md", readmeTemplate(opts.Name)},
 		{gitignoreFile, gitignoreTemplate(opts.Name)},
 	}
-	return writeVariant(opts.Dir, files)
+	report, err := writeVariant(opts.Dir, files)
+	if err != nil {
+		return nil, err
+	}
+	cmd := exec.Command("go", "mod", "tidy")
+	cmd.Dir = opts.Dir
+	_ = cmd.Run()
+	return report, nil
 }

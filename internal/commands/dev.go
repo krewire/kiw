@@ -1,16 +1,21 @@
 package commands
 
 import (
+	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
 	"os/exec"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 
+	"github.com/krewire/kiw/internal/config"
 	"github.com/krewire/kiw/internal/shape"
 	"github.com/krewire/libs/core"
 )
@@ -19,11 +24,16 @@ import (
 func RegisterDev(fs *flag.FlagSet) {
 	fs.String("addr", "", "listen address for the app (default :8080)")
 	fs.Duration("interval", 500*time.Millisecond, "file-watch polling interval")
+	fs.String("output", "", "output directory (default .krewire/build)")
+	fs.String("o", "", "output directory (shorthand for --output)")
+	fs.String("input", "", "content directory (default content)")
+	fs.String("base", "", "URL base the site will be served under (default /)")
 	registerRuntimeFlags(fs)
 }
 
 // RunDev runs the project in dev mode. For an app it rebuilds and restarts
-// the child on change; for site/book projects it behaves exactly like serve.
+// the child on change; for site/book projects it runs a live development server
+// with file watching and auto-rebuild.
 func RunDev(fs *flag.FlagSet) core.ExitCode {
 	rt, code := bootRuntime(fs)
 	if code != core.ExitCodeSuccess {
@@ -40,17 +50,82 @@ func RunDev(fs *flag.FlagSet) core.ExitCode {
 	switch res.Kind {
 	case shape.KindApp, shape.KindCLI:
 		return devApp(rt, fs)
-	case shape.KindSite:
-		if rt.cfg.IsSSG() {
-			return serveSSG(fs, rt.cfg)
-		}
-		fmt.Fprintln(os.Stderr, "kiw dev: site detected without an ssg: config")
-		return core.ExitCodeUsage
-	case shape.KindBook:
-		return serveBook(rt.root, fs)
+	case shape.KindSite, shape.KindBook:
+		return devSite(rt, fs)
 	default:
 		fmt.Fprintln(os.Stderr, "kiw dev: no project found — run 'kiw new <project>' first")
 		return core.ExitCodeUsage
+	}
+}
+
+// devSite runs a live development server for static sites and book projects,
+// rebuilding into .krewire/build whenever source files change.
+func devSite(rt *runtimeEnv, fs *flag.FlagSet) core.ExitCode {
+	root, cfg := rt.root, rt.cfg
+	addr := firstNonEmpty(flagValue(fs, "addr"), ":8080")
+	interval := fs.Lookup("interval").Value
+	every := 500 * time.Millisecond
+	if d, err := time.ParseDuration(interval.String()); err == nil && d > 0 {
+		every = d
+	}
+
+	buildSite := func() core.ExitCode {
+		return RunBuild(fs)
+	}
+
+	slog.Info("building site for development")
+	if code := buildSite(); code != core.ExitCodeSuccess {
+		slog.Error("initial site build failed")
+		return code
+	}
+
+	outDir := joinRoot(root, firstNonEmpty(flagValue(fs, "output"), flagValue(fs, "o"), cfg.Output), config.DefaultOutput)
+
+	srv := &http.Server{
+		Addr:    addr,
+		Handler: extensionlessFS(outDir),
+	}
+
+	serverErrCh := make(chan error, 1)
+	go func() {
+		displayAddr := addr
+		if strings.HasPrefix(displayAddr, ":") {
+			displayAddr = "http://localhost" + displayAddr
+		} else {
+			displayAddr = "http://" + displayAddr
+		}
+		slog.Info("dev server running", "url", displayAddr, "dir", outDir)
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			serverErrCh <- err
+		}
+	}()
+
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
+	defer signal.Stop(sigCh)
+
+	watcher := newWatcher(root, every, cfg)
+	slog.Info("watching for changes", "root", root, "interval", every)
+
+	for {
+		select {
+		case err := <-serverErrCh:
+			return fail(err)
+		case sig := <-sigCh:
+			slog.Info("dev received signal, stopping server", "signal", sig)
+			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+			defer cancel()
+			_ = srv.Shutdown(ctx)
+			return core.ExitCodeSuccess
+		case <-watcher.Changed():
+			watcher.Reset()
+			slog.Info("change detected, rebuilding...")
+			if code := buildSite(); code != core.ExitCodeSuccess {
+				slog.Error("site rebuild failed; keeping previous preview server running", "code", code)
+				continue
+			}
+			slog.Info("site rebuilt successfully")
+		}
 	}
 }
 

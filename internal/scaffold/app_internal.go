@@ -94,12 +94,27 @@ func internalConfigTemplate() string {
 		"// Metadata mirrors krewire.yaml.\n" +
 		"type Metadata struct {\n" +
 		"\tProject Project `yaml:\"project\"`\n" +
+		"\tDev     Dev     `yaml:\"dev\"`\n" +
 		"}\n\n" +
 		"// Project holds the project section of krewire.yaml.\n" +
 		"type Project struct {\n" +
 		"\tName    string `yaml:\"name\" validate:\"required\"`\n" +
 		"\tKind    string `yaml:\"kind\" validate:\"required\"`\n" +
 		"\tVersion string `yaml:\"version\"`\n" +
+		"}\n\n" +
+		"// Dev holds the dev section of krewire.yaml.\n" +
+		"type Dev struct {\n" +
+		"\tPort int `yaml:\"port\"`\n" +
+		"}\n\n" +
+		"// Addr returns the listen address derived from env or krewire.yaml dev.port.\n" +
+		"func (m *Metadata) Addr() string {\n" +
+		"\tif addr := os.Getenv(\"APP_ADDR\"); addr != \"\" {\n" +
+		"\t\treturn addr\n" +
+		"\t}\n" +
+		"\tif m.Dev.Port > 0 {\n" +
+		"\t\treturn fmt.Sprintf(\":%d\", m.Dev.Port)\n" +
+		"\t}\n" +
+		"\treturn \":8080\"\n" +
 		"}\n\n" +
 		"// LoadMetadata reads krewire.yaml from path, overlays the environment, and returns a\n" +
 		"// validated Metadata.\n" +

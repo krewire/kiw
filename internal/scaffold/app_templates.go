@@ -61,6 +61,9 @@ func krewireYamlTemplate(name string) string {
   name: %s
   kind: app
   version: 0.1.0
+
+dev:
+  port: 8080
 `, name)
 }
 
@@ -87,7 +90,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	if err := a.Run(meta.Addr); err != nil {
+	if err := a.Run(meta.Addr()); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
