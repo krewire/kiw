@@ -4,7 +4,7 @@ package version
 import "github.com/krewire/libs/core"
 
 // Version is the semantic version of the kiw devtool.
-var Version = core.MustParseVersion("0.3.3")
+var Version = core.MustParseVersion("0.1.0")
 
 // VersionString returns the version as a string for UI display.
 func VersionString() string { return Version.String() }
@@ -13,9 +13,9 @@ func VersionString() string { return Version.String() }
 // This is the authoritative compatibility contract for kiw; `kiw compat` validates
 // it against every other module's `<module>/version.go` declaration.
 var EcosystemRequires = map[core.ModuleName]core.Version{
-	core.ModuleFramework: core.MustParseVersion("0.3.1"),
-	core.ModuleLibs:      core.MustParseVersion("0.4.0"),
-	core.ModuleMdbind:    core.MustParseVersion("0.2.0"),
+	core.ModuleFramework: core.MustParseVersion("0.1.0"),
+	core.ModuleLibs:      core.MustParseVersion("0.1.0"),
+	core.ModuleMdbind:    core.MustParseVersion("0.1.0"),
 	core.ModuleBoost:     core.MustParseVersion("0.1.0"),
-	core.ModuleShip:      core.MustParseVersion("0.0.0"),
+	core.ModuleShip:      core.MustParseVersion("0.1.0"),
 }
