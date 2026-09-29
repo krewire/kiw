@@ -18,7 +18,7 @@ Extend `kiw run` — today only `kiw run`/`kiw run -- <args>` for full `app`/`cl
 
 ## 2. Background & Context
 
-`kiw` (module `github.com/krewire/kiw`, binary `kiw`) is the single CLI for all 8 kinds (`internal/docs/project-vision.md`, `libs/core/workload.go:Kind` — `app/cli/site/book/worker/service/infra/kernel`). `kiw run` (`kiw/internal/commands/run.go:34`) currently compiles the whole module (`go build -o /tmp/... .`) and execs the binary; `kiw dev` watches and restarts. `krewire.yaml` is the only config (`libs/config`, `kiw/internal/config/conf.go:DefaultOutput .krewire/build`).
+`kiw` (module `github.com/krewire/kiw`, binary `kiw`) is the single CLI for all 8 kinds (`internal/docs/project-vision.md`, `libs/core/workload.go:Kind` — `app/cli/site/book/worker/service/infra/kernel`). `kiw run` (`kiw/internal/commands/run.go:34`) currently compiles the whole module (`go build -o /tmp/... .`) and execs the binary; `kiw dev` watches and restarts. `krewire.yaml` is the only config (`libs/config`, `kiw/internal/config/config.go:DefaultOutput .krewire/build`).
 
 Developers coming from `composer run` / `npm run` / `python file.py` expect two ergonomics Go lacks natively:
 * **File-as-script:** `go run tools/migrate.go` works but ignores project env (`krewire.yaml` → `.env` → `KIW_ENV` per `KWL-K4T7W` / `KWN-CONF-Q7X4M`) and signal forwarding that `kiw run` already provides for apps.
@@ -97,7 +97,7 @@ Both are **devtool concerns**, not new workloads — they enrich `cli`/`kernel` 
 ```
 Workspace (go.work hub, bin/kiw)
  └─ Module: github.com/krewire/kiw
-     ├─ kiw/internal/config/conf.go  — add Scripts map, inject into build
+     ├─ kiw/internal/config/config.go  — add Scripts map, inject into build
      ├─ kiw/internal/commands/run.go — branch: isGoFile(path) ? runGoFile : isScript(task) ? runScript : runApp/runCLI (existing)
      ├─ kiw/internal/commands/info.go — list scripts
      └─ libs/core, libs/validation      — unchanged (core stdlib-only)
@@ -108,7 +108,7 @@ Dependency direction: `kiw` → `libs` (core/validate/config) — no `framework`
 ### 6.2 API Design
 
 ```go
-// kiw/internal/config/conf.go
+// kiw/internal/config/config.go
 type Config struct {
     Scripts map[string]string `yaml:"scripts"` // KWN-SCR-005
 }
@@ -199,7 +199,7 @@ Impact: `framework/mdbind/guild/libs` unchanged. `go.work` unchanged. `AGENTS.md
 ## 9. References
 
 * `kiw/internal/commands/run.go:34` — current `RunRun` + `runApp`/`runCLI` + `waitChild`
-* `kiw/internal/config/conf.go` — `Config` struct (`Output`, `Input`, `SSG`)
+* `kiw/internal/config/config.go` — `Config` struct (`Output`, `Input`, `SSG`)
 * `kiw/cmd/kiw/main.go:18` — `tui.NewCommand("run", ...)`
 * Go `os/exec`, `os/signal`, `syscall` (stdib) — already used in `run.go`
 * `npm run` / `composer run` / `python file.py` ergonomics — user request 2026-08-27
