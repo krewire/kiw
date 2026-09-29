@@ -10,13 +10,24 @@ jobs:
     name: Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
         with:
           go-version: "stable"
+          check-latest: true
+          cache: true
+
       - name: Format
         run: test -z "$(gofmt -l .)"
+
       - name: Vet
         run: go vet ./...
+
       - name: Test
-        run: go test ./...
+        run: go test -race -count=1 ./...
+
+      - name: Build static binary (CGO_ENABLED=0)
+        run: CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" ./cmd/kiw
