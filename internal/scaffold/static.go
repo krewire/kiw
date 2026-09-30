@@ -59,7 +59,7 @@ layout: Base
 <div class="hero-container">
   <h1>Welcome to {{.Title}}</h1>
   <p>A fast, modern static site built with Go and Krewire.</p>
-  {{component "Hero" .}}
+  <Hero . />
 </div>
 
 <style>
