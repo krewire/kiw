@@ -25,8 +25,8 @@ The devtool dogfoods the unified framework's `tui` package, so the tool that man
 | `kiw dev` | Rebuild + auto-restart (incl. WASM) | `app`, `cli`, `worker`, `service` |
 | `kiw worker` | Run background workers | `worker` — *planned* |
 | `kiw deploy` | Validate (+tests for Go projects), stage into `.krewire/dist/`, publish site to the pages branch (`--target binary\|gh-pages`, `--branch`, `--remote`, `--dry-run`) | all |
-| `kiw dashboard` | Local dev dashboard (services, logs, traces, infra) | `worker`, `service`, `infra` — *planned* |
-| `kiw generate` | Code generation (OpenAPI, config, etc.) | all — *planned* |
+| `kiw dashboard` | Local dev dashboard (services, logs, traces) | `worker`, `service`, `infra` |
+| `kiw generate` | Generate code (handlers, migrations, specs) | all |
 | `kiw test` | Run `go test ./...` (spawn Go toolchain) | all |
 | `kiw vet` | Run `go vet ./...` (spawn Go toolchain) | all |
 | `kiw fmt` | Check/format with `gofmt -l/-w` or `go fmt ./...` (spawn Go toolchain) | all |
