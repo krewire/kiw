@@ -3,26 +3,16 @@ module github.com/krewire/kiw
 go 1.26.0
 
 require (
-	github.com/krewire/framework v0.3.1
 	github.com/krewire/boost v0.1.0
-	github.com/krewire/libs v0.4.0
-	github.com/krewire/hub v0.0.0
-	github.com/krewire/ship v0.0.0
+	github.com/krewire/framework v0.1.0
+	github.com/krewire/hub v0.1.0
+	github.com/krewire/libs v0.1.0
+	github.com/krewire/mdbind v0.1.0
+	github.com/krewire/ship v0.1.0
 )
 
 require gopkg.in/yaml.v3 v3.0.1
 
 require golang.org/x/net v0.59.0 // indirect
 
-require (
-	github.com/krewire/mdbind v0.2.0
-	github.com/yuin/goldmark v1.8.5 // indirect
-)
-
-replace github.com/krewire/hub => ../hub
-
-replace github.com/krewire/ship => ../ship
-
-replace github.com/krewire/libs => ../libs
-
-replace github.com/krewire/boost => ../boost
+require github.com/yuin/goldmark v1.8.5 // indirect
