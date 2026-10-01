@@ -218,17 +218,22 @@ func exportSiteAssets(root string, fs *flag.FlagSet) core.ExitCode {
 		return core.ExitCodeSuccess
 	}
 	// Mirror RunBuild: SSG from file (pages/) takes precedence over ssg: config
+	var planCSS, planJS []string
 	if hasPages {
-		if code := buildSSGFromFile(root, cfg, fs); code != core.ExitCodeSuccess {
+		code, css, js := buildSSGFromFile(root, cfg, fs)
+		planCSS, planJS = css, js
+		if code != core.ExitCodeSuccess {
 			return code
 		}
 	} else if hasSSG {
-		if code := buildSSGFromConfig(root, cfg, fs); code != core.ExitCodeSuccess {
+		code, css, js := buildSSGFromConfig(root, cfg, fs)
+		planCSS, planJS = css, js
+		if code != core.ExitCodeSuccess {
 			return code
 		}
 	}
 	if hasBook {
-		if code := buildManuscript(root, cfg, fs, hasPages || hasSSG); code != core.ExitCodeSuccess {
+		if code := buildManuscript(root, cfg, fs, hasPages || hasSSG, planCSS, planJS); code != core.ExitCodeSuccess {
 			return code
 		}
 	}

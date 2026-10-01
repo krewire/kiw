@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -61,21 +62,30 @@ func RunBuild(fs *flag.FlagSet) core.ExitCode {
 	pruneStale(outDir)
 	var firstErr core.ExitCode = core.ExitCodeSuccess
 	built := false
+	// assetPlan is the resolved CSS/JS order reported by the ssg half. A book
+	// mounted into the same output reuses it verbatim instead of keeping its own
+	// copy of the asset list (AGENTS.md § No Hardcoding).
+	var planCSS, planJS []string
 	if hasPages {
-		if code := buildSSGFromFile(root, cfg, fs); code != core.ExitCodeSuccess {
+		code, css, js := buildSSGFromFile(root, cfg, fs)
+		planCSS, planJS = css, js
+		if code != core.ExitCodeSuccess {
 			firstErr = code
 		} else {
 			built = true
 		}
 	} else if hasSSG {
-		if code := buildSSGFromConfig(root, cfg, fs); code != core.ExitCodeSuccess {
+		code, css, js := buildSSGFromConfig(root, cfg, fs)
+		planCSS, planJS = css, js
+		if code != core.ExitCodeSuccess {
 			firstErr = code
 		} else {
 			built = true
 		}
 	}
 	if hasBook {
-		if code := buildManuscript(root, cfg, fs, hasPages || hasSSG); code != core.ExitCodeSuccess {
+		hybrid := hasPages || hasSSG
+		if code := buildManuscript(root, cfg, fs, hybrid, planCSS, planJS); code != core.ExitCodeSuccess {
 			if firstErr == core.ExitCodeSuccess {
 				firstErr = code
 			}
@@ -187,13 +197,13 @@ func collectCreated(outDir string) []string {
 // Detected plugins (e.g. Tailwind via tailwind.config.js) run first and their
 // CSS/JS output paths are declared to the site, so `kiw build` auto-injects the
 // matching tags — the layout never names plugin assets by hand.
-func buildSSGFromFile(root string, cfg *config.Config, fs *flag.FlagSet) core.ExitCode {
+func buildSSGFromFile(root string, cfg *config.Config, fs *flag.FlagSet) (core.ExitCode, []string, []string) {
 	output := firstNonEmpty(flagValue(fs, "output"), flagValue(fs, "o"), cfg.Output, config.DefaultOutput)
 	outDir := joinRoot(root, output, config.DefaultOutput)
 	slog.Info("building SSG site from file layout", "root", root, "output", outDir)
 	site, err := ssg.LoadFromDir(root)
 	if err != nil {
-		return fail(err)
+		return fail(err), nil, nil
 	}
 	// Run detected plugins (Tailwind is the first; others follow the same pattern).
 	for _, p := range plugin.Registry {
@@ -212,30 +222,32 @@ func buildSSGFromFile(root string, cfg *config.Config, fs *flag.FlagSet) core.Ex
 	}
 	created, err := site.Build(outDir)
 	if err != nil {
-		return fail(err)
+		return fail(err), nil, nil
 	}
 	for _, p := range created {
 		fmt.Println("created " + p)
 	}
-	return core.ExitCodeSuccess
+	css, js := site.InjectedAssets()
+	return core.ExitCodeSuccess, css, js
 }
 
 // buildSSGFromConfig builds the project's SSG site from the `ssg:` section
 // of krewire.yaml. Top-level fields (title, output, theme) are merged into the
 // ssg.Config so they don't need to be repeated under ssg:.
-func buildSSGFromConfig(root string, cfg *config.Config, fs *flag.FlagSet) core.ExitCode {
+func buildSSGFromConfig(root string, cfg *config.Config, fs *flag.FlagSet) (core.ExitCode, []string, []string) {
 	ssgCfg := cfg.ToSSGConfig()
 	output := firstNonEmpty(flagValue(fs, "output"), flagValue(fs, "o"), cfg.Output, config.DefaultOutput)
 	outDir := joinRoot(root, output, config.DefaultOutput)
 	slog.Info("building SSG site from krewire.yaml", "output", outDir)
-	created, err := ssg.BuildFromConfig(ssgCfg, outDir)
+	site, created, err := ssg.BuildFromConfigSite(ssgCfg, outDir)
 	if err != nil {
-		return fail(err)
+		return fail(err), nil, nil
 	}
 	for _, p := range created {
 		fmt.Println("created " + p)
 	}
-	return core.ExitCodeSuccess
+	css, js := site.InjectedAssets()
+	return core.ExitCodeSuccess, css, js
 }
 
 // buildManuscript renders the project's content/ directory with mdbind.
@@ -243,7 +255,7 @@ func buildSSGFromConfig(root string, cfg *config.Config, fs *flag.FlagSet) core.
 // In a hybrid project (ssg pages present) the book suppresses its generated
 // root TOC so the ssg landing page owns "/". Include/exclude path globs
 // resolve flag > krewire.yaml `build:` > mdbind defaults (README skipped).
-func buildManuscript(root string, cfg *config.Config, fs *flag.FlagSet, hybrid bool) core.ExitCode {
+func buildManuscript(root string, cfg *config.Config, fs *flag.FlagSet, hybrid bool, planCSS, planJS []string) core.ExitCode {
 	title := firstNonEmpty(flagValue(fs, "title"), cfg.Title, moduleName(root))
 	input := firstNonEmpty(flagValue(fs, "input"), cfg.Input)
 	if input == "" {
@@ -270,6 +282,17 @@ func buildManuscript(root string, cfg *config.Config, fs *flag.FlagSet, hybrid b
 		Exclude:    exclude,
 	}
 	slog.Info("building site with mdbind", "input", bcfg.Input, "output", bcfg.Output)
+	if hybrid {
+		// The ssg half owns the site's asset order. Reuse the plan it reported
+		// instead of repeating the list here, so the book pages and the landing
+		// page can never load stylesheets in different orders
+		// (AGENTS.md § No Hardcoding).
+		//
+		// mdbind links its own stylesheet last by itself, so the site's copy of
+		// that entry is dropped to avoid a duplicate <link>.
+		bcfg.ExtraCSS = versionedAssetURLs(withoutAsset(planCSS, book.StylesheetName), cfg.Version)
+		bcfg.ExtraJS = versionedAssetURLs(planJS, cfg.Version)
+	}
 	created, err := book.Build(bcfg)
 	if err != nil {
 		return fail(err)
@@ -278,6 +301,33 @@ func buildManuscript(root string, cfg *config.Config, fs *flag.FlagSet, hybrid b
 		fmt.Println("created " + path)
 	}
 	return core.ExitCodeSuccess
+}
+
+// versionedAssetURLs appends the product version as a cache-busting query,
+// matching what the ssg half injects so both halves refresh together.
+func versionedAssetURLs(urls []string, version string) []string {
+	if version == "" || len(urls) == 0 {
+		return urls
+	}
+	out := make([]string, 0, len(urls))
+	for _, u := range urls {
+		out = append(out, u+"?v="+strings.TrimPrefix(version, "v"))
+	}
+	return out
+}
+
+// withoutAsset drops the entry naming asset from an asset plan. Plan URLs are
+// "/assets/<name>", so the base name is compared.
+func withoutAsset(urls []string, asset string) []string {
+	base := path.Base(strings.TrimPrefix(asset, "/"))
+	out := make([]string, 0, len(urls))
+	for _, u := range urls {
+		if path.Base(u) == base {
+			continue
+		}
+		out = append(out, u)
+	}
+	return out
 }
 
 // buildWASM compiles the project's WASM entry point (KWF-T4X9P FRK-WASM-002).
