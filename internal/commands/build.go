@@ -180,10 +180,13 @@ func collectCreated(outDir string) []string {
 }
 
 // buildSSGFromFile builds the project's SSG site from the file-based layout
-// (pages/, components/, layouts/, content/, public/) using ssg.LoadFromDir.
-// krewire.yaml supplies metadata (title, description, theme) and output dir.
-// After the core site is built, any detected plugins (e.g., Tailwind via
-// tailwind.config.js) are run — they may write additional assets into outDir.
+// (pages/, components/, layouts/, content/, public/) using
+// ssg.LoadFromDir. krewire.yaml supplies metadata (title, description, theme)
+// and output dir.
+//
+// Detected plugins (e.g. Tailwind via tailwind.config.js) run first and their
+// CSS/JS output paths are declared to the site, so `kiw build` auto-injects the
+// matching tags — the layout never names plugin assets by hand.
 func buildSSGFromFile(root string, cfg *config.Config, fs *flag.FlagSet) core.ExitCode {
 	output := firstNonEmpty(flagValue(fs, "output"), flagValue(fs, "o"), cfg.Output, config.DefaultOutput)
 	outDir := joinRoot(root, output, config.DefaultOutput)
@@ -192,20 +195,24 @@ func buildSSGFromFile(root string, cfg *config.Config, fs *flag.FlagSet) core.Ex
 	if err != nil {
 		return fail(err)
 	}
+	// Run detected plugins (Tailwind is the first; others follow the same pattern).
+	for _, p := range plugin.Registry {
+		if !p.Detect(root) {
+			continue
+		}
+		slog.Info("plugin detected", "plugin", p.Name())
+		if err := p.Build(root, outDir); err != nil {
+			slog.Warn("plugin build failed", "plugin", p.Name(), "err", err)
+			continue
+		}
+		slog.Info("plugin built", "plugin", p.Name())
+		if ap, ok := p.(plugin.AssetProvider); ok {
+			site.DeclareAsset(ap.Assets(root)...)
+		}
+	}
 	created, err := site.Build(outDir)
 	if err != nil {
 		return fail(err)
-	}
-	// Run detected plugins (Tailwind is the first; others follow the same pattern).
-	for _, p := range plugin.Registry {
-		if p.Detect(root) {
-			slog.Info("plugin detected", "plugin", p.Name())
-			if err := p.Build(root, outDir); err != nil {
-				slog.Warn("plugin build failed", "plugin", p.Name(), "err", err)
-			} else {
-				slog.Info("plugin built", "plugin", p.Name())
-			}
-		}
 	}
 	for _, p := range created {
 		fmt.Println("created " + p)

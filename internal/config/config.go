@@ -147,6 +147,8 @@ type SSGConfig struct {
 	Pages []SSGPageConfig `yaml:"pages"`
 	// Assets maps output paths to file contents.
 	Assets map[string]string `yaml:"assets"`
+	// AutoAssets carries the ssg.auto_assets block into the ssg.Config.
+	AutoAssets *ssg.AutoAssetConfig `yaml:"auto_assets"`
 }
 
 // SSGLayoutConfig is a layout entry under ssg.layouts.
@@ -186,6 +188,7 @@ func (c *Config) ToSSGConfig() *ssg.Config {
 		Version:     c.Version,
 		Output:      c.Output,
 		Assets:      s.Assets,
+		AutoAssets:  s.AutoAssets,
 	}
 	if c.Theme != nil {
 		cfg.Theme = &ssg.ThemeConfig{
