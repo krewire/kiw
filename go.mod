@@ -1,6 +1,6 @@
 module github.com/krewire/kiw
 
-go 1.26.0
+go 1.27.1
 
 require (
 	github.com/krewire/boost v0.1.0
