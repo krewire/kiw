@@ -12,11 +12,11 @@ import (
 	"github.com/krewire/framework/runtime/build"
 	"github.com/krewire/framework/ui"
 	"github.com/krewire/framework/web/ssg"
+	"github.com/krewire/hub/plugin"
 	"github.com/krewire/kiw/internal/config"
 	"github.com/krewire/kiw/internal/gomod"
 	"github.com/krewire/libs/core"
 	"github.com/krewire/mdbind/book"
-	"github.com/krewire/hub/plugin"
 )
 
 // RegisterBuild registers flags for the build command.
