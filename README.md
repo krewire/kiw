@@ -15,11 +15,8 @@ The devtool dogfoods the unified framework's `tui` package, so the tool that man
 | `kiw init --site` | Equip a declarative static site (`ssg:`) | kernel |
 | `kiw init --book` | Equip a manuscript book (`book`) | kernel |
 | `kiw init --cli` | Equip a CLI app (`cli`) | kernel |
-| `kiw init --worker` | Equip a worker (`worker`) | kernel — *planned* |
-| `kiw init --service` | Equip a microservice (`service`) | kernel — *planned* |
-| `kiw init --infra` | Equip cloud infra (`infra`) | kernel — *planned* |
 | `kiw init --template <git-url>` | Clone a starter | empty dir |
-| `kiw build` | Build (binary / `.krewire/build` / infra plan) | all |
+| `kiw build` | Build the current project (site, book, binary, or infra plan) | all |
 | `kiw serve` | Start the project locally: compile & listen (`app`), execute with args (`cli`), preview static output (`site`, `book`) | any detected kind (`app`, `cli`, `site`, `book`) |
 | `kiw run [args]` | Build & run the binary | `app`, `cli`, `worker`, `service` |
 | `kiw dev` | Rebuild + auto-restart (incl. WASM) | `app`, `cli`, `worker`, `service` |
@@ -32,7 +29,7 @@ The devtool dogfoods the unified framework's `tui` package, so the tool that man
 | `kiw fmt` | Check/format with `gofmt -l/-w` or `go fmt ./...` (spawn Go toolchain) | all |
 | `kiw info` | Environment + detected kind | all |
 | `kiw version` | CLI + framework versions | all |
-| `kiw guild install` | Install the Guild AI template | any project |
+| `kiw boost install` | Install the Boost AI template | any project |
 | `kiw ws <sub>` | Workspace management for monorepo/multi-repo layouts: `info`, `list`, `add`, `remove`, `sync`, `exec` | `go.work` workspaces |
 | `kiw help <cmd>` / `kiw <cmd> help` / `kiw <cmd> --help` | Show help for a command | all |
 
