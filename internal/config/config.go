@@ -121,6 +121,16 @@ type Project struct {
 	// Kind pins the project kind: "app", "cli", "site", or "book". Empty
 	// lets the CLI detect it from marker files.
 	Kind string `yaml:"kind"`
+	// Version is the product version declared next to the kind, the way a
+	// project writes it:
+	//
+	//	project:
+	//	  kind: site
+	//	  version: v0.1.0
+	//
+	// Load folds it into Config.Version when no top-level `version:` is set,
+	// so the version has one effective value regardless of where it is declared.
+	Version string `yaml:"version"`
 	// Dirs overrides the canonical directory locations (FRK-STR-010).
 	Dirs Dirs `yaml:"dirs"`
 }
@@ -271,6 +281,13 @@ func Load(dir string) (*Config, error) {
 	var c Config
 	if err := yaml.Unmarshal(data, &c); err != nil {
 		return nil, fmt.Errorf("config: parse %s: %w", path, err)
+	}
+	// A project declares its version either at the top level or next to the
+	// kind. Fold the latter into the single effective value so both pipelines
+	// (ssg page data and the mdbind asset cache-busting query) see the same
+	// version instead of one silently losing it.
+	if c.Version == "" {
+		c.Version = c.Project.Version
 	}
 	return &c, nil
 }
