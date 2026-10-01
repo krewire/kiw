@@ -20,7 +20,7 @@ The devtool dogfoods the unified framework's `tui` package, so the tool that man
 | `kiw serve` | Start the project locally: compile & listen (`app`), execute with args (`cli`), preview static output (`site`, `book`) | any detected kind (`app`, `cli`, `site`, `book`) |
 | `kiw run [args]` | Build & run the binary | `app`, `cli`, `worker`, `service` |
 | `kiw dev` | Rebuild + auto-restart (incl. WASM) | `app`, `cli`, `worker`, `service` |
-| `kiw worker` | Run background workers | `worker` — *planned* |
+| `kiw worker` | Run background workers and inspect the dead-letter queue | `worker` |
 | `kiw deploy` | Validate (+tests for Go projects), stage into `.krewire/dist/`, publish site to the pages branch (`--target binary\|gh-pages`, `--branch`, `--remote`, `--dry-run`) | all |
 | `kiw dashboard` | Local dev dashboard (services, logs, traces) | `worker`, `service`, `infra` |
 | `kiw generate` | Generate code (handlers, migrations, specs) | all |
