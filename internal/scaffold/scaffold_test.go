@@ -21,7 +21,12 @@ func TestNewCreatesKernel(t *testing.T) {
 	}
 
 	assertFileContains(t, filepath.Join(parent, "demo", "go.mod"), "module demo")
-	assertFileContains(t, filepath.Join(parent, "demo", "go.mod"), "go 1.22")
+	assertFileContains(t, filepath.Join(parent, "demo", "go.mod"), "go "+GoVersion)
+	// The scaffolded directive must never be older than the workspace modules
+	// it requires, otherwise `go build` rejects the generated module.
+	if lessThan(GoVersion, requiredGoBaseline(t)) {
+		t.Errorf("GoVersion = %q is older than the kiw module baseline %q", GoVersion, requiredGoBaseline(t))
+	}
 	assertFileNotContains(t, filepath.Join(parent, "demo", "go.mod"), "github.com/krewire/framework")
 	assertFileContains(t, filepath.Join(parent, "demo", "krewire.yaml"), "name: demo")
 	assertFileContains(t, filepath.Join(parent, "demo", "main.go"), "package main")
@@ -313,4 +318,54 @@ func gitInitCommit(dir string) error {
 	}
 	cmd = exec.Command("git", "-C", dir, "-c", "user.name=test", "-c", "user.email=test@example.com", "commit", "-q", "-m", "init")
 	return cmd.Run()
+}
+
+// requiredGoBaseline is the `go` directive declared by the kiw module itself,
+// read from ../../go.mod. A generated project depends on the framework/libs
+// modules, so the scaffolded directive must be at least this new. Reading the
+// real file means raising the baseline elsewhere cannot silently desync.
+func requiredGoBaseline(t *testing.T) string {
+	t.Helper()
+	data, err := os.ReadFile(filepath.Join("..", "..", "go.mod"))
+	if err != nil {
+		t.Fatalf("read kiw go.mod: %v", err)
+	}
+	for _, line := range strings.Split(string(data), "\n") {
+		if rest, ok := strings.CutPrefix(strings.TrimSpace(line), "go "); ok {
+			return strings.TrimSpace(rest)
+		}
+	}
+	t.Fatal("kiw go.mod has no go directive")
+	return ""
+}
+
+// lessThan reports whether Go version a is older than b, comparing dotted
+// numeric components and ignoring any patch suffix. Missing components count
+// as zero, so "1.27" < "1.27.1".
+func lessThan(a, b string) bool {
+	fa, fb := goComponents(a), goComponents(b)
+	for i := 0; i < 3; i++ {
+		if fa[i] != fb[i] {
+			return fa[i] < fb[i]
+		}
+	}
+	return false
+}
+
+// goComponents splits a dotted Go version into three numeric components,
+// returning zeros for absent parts. A non-numeric part becomes zero.
+func goComponents(v string) [3]int {
+	var out [3]int
+	for i, part := range strings.SplitN(strings.TrimSpace(v), ".", 3) {
+		n := 0
+		for _, r := range part {
+			if r < '0' || r > '9' {
+				n = 0
+				break
+			}
+			n = n*10 + int(r-'0')
+		}
+		out[i] = n
+	}
+	return out
 }

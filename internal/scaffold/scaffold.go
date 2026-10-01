@@ -117,10 +117,19 @@ func New(opts Options) ([]string, error) {
 	return created, nil
 }
 
+// GoVersion is the Go language version emitted into scaffolded go.mod files.
+// It is the single source of truth for the Krewire Go baseline: a generated
+// project must declare a version at least as new as the go directive of the
+// framework and libs modules it requires, or `go build` rejects the module.
+//
+// Keep in sync with the `go` directive in the workspace go.work and in every
+// module go.mod (see internal/docs/version.md §Go Baseline).
+const GoVersion = "1.27.1"
+
 // kernel returns the minimal kernel file set.
 func kernel(name, module string) []file {
 	return []file{
-		{goModFile, fmt.Sprintf("module %s\n\ngo 1.22\n", module)},
+		{goModFile, fmt.Sprintf("module %s\n\ngo %s\n", module, GoVersion)},
 		{krewireYaml, fmt.Sprintf("project:\n  name: %s\n", name)},
 		{mainGo, kernelBody},
 		{gitignoreFile, gitignoreTemplate(name)},
