@@ -39,7 +39,7 @@ The devtool dogfoods the unified framework's `tui` package, so the tool that man
 
 ### Prerequisites
 
-- Go 1.26+
+- Go 1.27.1+
 
 ### Build
 
